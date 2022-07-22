@@ -1,24 +1,12 @@
 import type { RequestHandler } from '@sveltejs/kit'
 import { useCaravaggioBuilder } from '$lib/components/caravaggio/useCaravaggio'
-import { getStore, type Store } from '$lib/db'
 
 export const GET: RequestHandler = async (event) => {
   let layout = event.locals.layout
   const imageBuilder = useCaravaggioBuilder(
     event.url.protocol + '//' + event.url.host
   )
-  let store: Store | null = null
-  if (layout === 'store') {
-    store = await getStore({ host: event.url.host })
-    if (!store) {
-      let slug = event.url.searchParams.get('store')
-      if (!slug) {
-        slug = event.url.host.split('.')[0]
-      }
-      store = await getStore({ slug })
-    }
-  }
-  const icon = store?.favicon || '/images/logo.svg'
+  const icon = '/images/logo.svg'
   const iconsRes = [36, 48, 72, 96, 144, 192, 256, 384, 512]
   const getIcon = (res: number) =>
     imageBuilder(icon, {
@@ -32,14 +20,19 @@ export const GET: RequestHandler = async (event) => {
       },
     })
 
+  const title =
+    layout === 'app'
+      ? 'Arepa Venezuelan Kitchen Admin'
+      : 'Arepa Venezuelan Kitchen Admin'
+
   return {
     headers: {
       'content-type': 'application/json; charset=utf-8',
     },
     body: {
-      name: store?.name || 'ShackCart',
-      short_name: store?.name || 'ShackCart',
-      description: store?.name || 'ShackCart',
+      name: title,
+      short_name: title,
+      description: title,
       dir: 'auto',
       lang: 'en-US',
       display: 'standalone',

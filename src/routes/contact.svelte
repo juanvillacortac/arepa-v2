@@ -19,12 +19,12 @@
 
   const submit = () => {
     dialog = true
-    trpc().mutation('stores:marketing:sendContactEmail', {
-      email,
-      message,
-      phone,
-      name: `${firstName} ${lastName}`,
-    })
+    // trpc().mutation('stores:marketing:sendContactEmail', {
+    //   email,
+    //   message,
+    //   phone,
+    //   name: `${firstName} ${lastName}`,
+    // })
   }
 </script>
 
@@ -34,7 +34,7 @@
     use:portal
   >
     <div
-      class="bg-black h-full w-full opacity-70 absolute"
+      class="bg-black h-full w-full opacity-70 absolute backdrop-filter backdrop-blur-xl"
       transition:fade={{ duration: 400, easing: expoOut }}
       on:click={() => (dialog = false)}
     />
@@ -157,7 +157,7 @@
         </button>
       </div>
     </form>
-    {#if $page.stuff.store?.contactData?.email || $page.stuff.store?.contactData?.phone}
+    <!-- {#if $page.stuff.store?.contactData?.email || $page.stuff.store?.contactData?.phone}
       <div
         class="border rounded-lg flex flex-col space-y-4 border-gray-300 w-full p-4 lg:w-2/10 dark:border-dark-400"
       >
@@ -185,6 +185,6 @@
           {/if}
         </ul>
       </div>
-    {/if}
+    {/if} -->
   </div>
 </div>

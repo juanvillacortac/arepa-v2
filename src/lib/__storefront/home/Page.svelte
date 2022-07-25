@@ -276,7 +276,7 @@
               <a
                 {href}
                 use:contenteditable
-                class="rounded-full font-bold border-2 border-dark-900 text-center text-sm py-2 px-4 text-dark-900 duration-200 dark:(border-gray-100 text-gray-100) hover:dark:(text-dark-900 bg-gray-100) "
+                class="rounded-full font-bold border-2 border-dark-900 text-center text-sm py-2 px-4 text-dark-900 duration-200 dark:(border-gray-100 text-gray-100) hover:(bg-dark-900 text-gray-100) hover:dark:(text-dark-900 bg-gray-100) "
               >
                 {@html text}
               </a>
@@ -469,7 +469,7 @@
             <a
               {href}
               use:contenteditable
-              class="rounded-full font-bold border-2 border-dark-900 text-center text-sm py-2 px-4 text-dark-900 duration-200 dark:(border-gray-100 text-gray-100) hover:dark:(text-dark-900 bg-gray-100) "
+              class="rounded-full font-bold border-2 border-dark-900 text-center text-sm py-2 px-4 text-dark-900 duration-200 dark:(border-gray-100 text-gray-100) hover:(bg-dark-900 text-gray-100) hover:dark:(text-dark-900 bg-gray-100) "
             >
               {@html text}
             </a>

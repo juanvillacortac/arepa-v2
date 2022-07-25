@@ -1,8 +1,8 @@
 <script context="module" lang="ts">
   import trpc, { type InferQueryOutput } from '$lib/trpc/client'
-  import type { Load } from '@sveltejs/kit'
+  import type { Load } from './__types/[id]'
 
-  export const load: Load = async ({ fetch, params }) => {
+  export const load = async ({ fetch, params }) => {
     const customer = await trpc(fetch).query('customer:get', params.id)
     if (!customer) {
       return {

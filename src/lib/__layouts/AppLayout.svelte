@@ -264,7 +264,12 @@
                 href={$page.url.pathname.substring(
                   0,
                   $page.url.pathname.lastIndexOf('/')
-                )}><ChevronLeft24 /></a
+                ) === $page.url.pathname
+                  ? '/'
+                  : $page.url.pathname.substring(
+                      0,
+                      $page.url.pathname.lastIndexOf('/')
+                    )}><ChevronLeft24 /></a
               >
               <a href="/" class="p-1 dark:(filter invert) ">
                 <Image

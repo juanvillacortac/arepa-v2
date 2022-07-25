@@ -420,7 +420,7 @@
   <div class="flex w-full py-16">
     <Viewport
       oneWay
-      class="flex-col flex w-full items-center lg:flex-row-reverse"
+      class="flex-col flex w-full items-center lg:flex-row-reverse <lg:mb-16"
       --a-y="1rem"
     >
       <div class="flex flex-col space-y-6 w-full items-center justify-center">
@@ -477,7 +477,7 @@
         </div>
       </div>
       <div
-        class="flex w-full justify-center relative items-center anim <lg:mb-16"
+        class="flex w-full justify-center relative items-center anim"
         style:--anim-d="400ms"
       >
         <div

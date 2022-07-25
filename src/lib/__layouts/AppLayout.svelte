@@ -29,6 +29,7 @@
   import { fly, scale } from 'svelte/transition'
   import { expoOut } from 'svelte/easing'
   import trpc from '$lib/trpc/client'
+  import { dev } from '$app/env'
 
   $: path = $page.url.pathname
 
@@ -57,6 +58,11 @@
       icon: UserAvatar24,
       title: 'Customers',
       href: `/customers`,
+    },
+    {
+      icon: ColorPalette24,
+      title: 'Customize landing',
+      href: `/landing`,
     },
     {
       icon: Settings24,
@@ -93,7 +99,11 @@
   <title>{pageTitle}</title>
 </svelte:head>
 
-<Favicons favicon="/images/logo.svg" themeColor="#000" titleName="ShackCart" />
+<Favicons
+  favicon="/images/favicon.webp"
+  themeColor="#000"
+  titleName="AVK Admin"
+/>
 
 {#if $session.userId}
   <div class="flex flex-col h-screen w-full overflow-hidden">
@@ -258,7 +268,8 @@
               >
               <a href="/" class="p-1 dark:(filter invert) ">
                 <Image
-                  src="https://arepavenezuelankitchen.vercel.app/_next/image?url=%2Fimages%2Flogo-alt.png&w=96&q=90"
+                  src="/images/logo.webp"
+                  showOriginal={dev ? 'webp' : undefined}
                   options={{
                     q: 100,
                   }}

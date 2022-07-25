@@ -1,7 +1,7 @@
 <script lang="ts">
   import { pageSubtitle } from '$lib'
   import { Close24, Email24, Email32, PhoneFilled24 } from 'carbon-icons-svelte'
-  import { fade, scale } from 'svelte/transition'
+  import { fade, fly, scale } from 'svelte/transition'
   import { portal } from 'svelte-portal'
   import { expoOut } from 'svelte/easing'
   import trpc from '$lib/trpc/client'
@@ -19,7 +19,7 @@
 
   const submit = () => {
     dialog = true
-    // trpc().mutation('stores:marketing:sendContactEmail', {
+    // trpc().mutation('utils:marketing:sendContactEmail', {
     //   email,
     //   message,
     //   phone,
@@ -30,18 +30,18 @@
 
 {#if dialog}
   <div
-    class="flex h-full w-full top-0 z-99 fixed items-center justify-center"
+    class="flex h-full w-full top-0 z-99 fixed items-center justify-center backdrop-filter backdrop-blur-md"
+    transition:fade={{ duration: 300, easing: expoOut }}
     use:portal
   >
     <div
-      class="bg-black h-full w-full opacity-70 absolute backdrop-filter backdrop-blur-xl"
-      transition:fade={{ duration: 400, easing: expoOut }}
+      class="bg-black h-full w-full opacity-70 absolute"
       on:click={() => (dialog = false)}
     />
     <div
       class="bg-white rounded-xl flex flex-col space-y-4 shadow max-h-9/10 p-4 relative lg:max-w-4/10 dark:bg-dark-900"
       style="will-change: transform"
-      transition:scale={{ start: 0.9, duration: 400, easing: expoOut }}
+      transition:fly={{ y: 10, duration: 400, easing: expoOut }}
     >
       <div class="flex items-center justify-between">
         <h4 class="font-bold text-xl text-black leading-thight dark:text-white">
@@ -150,7 +150,7 @@
           junk/spam folder.
         </p>
         <button
-          class="rounded flex font-bold space-x-2 bg-dark-800 shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end disabled:cursor-not-allowed hover:not-disabled:scale-105"
+          class="rounded flex font-bold space-x-2 bg-dark-800 shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end dark:bg-gray-100 dark:text-dark-900 disabled:cursor-not-allowed hover:not-disabled:scale-105"
           style="will-change: transform"
         >
           Send message

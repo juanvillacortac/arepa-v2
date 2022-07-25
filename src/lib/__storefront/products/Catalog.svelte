@@ -2,25 +2,24 @@
   import { goto } from '$app/navigation'
   import { page } from '$app/stores'
   import { squareratio } from '$lib/actions/aspectratio'
+  import Image from '$lib/components/caravaggio/Image.svelte'
   import { tooltip } from '$lib/components/tooltip'
   import Ufo from '$lib/components/__Ufo.svelte'
 
   import type { StripedProduct } from '$lib/db'
   import { favorites } from '$lib/stores'
   import { search as s } from '$lib/utils/search'
-  import AppLayout from '$lib/__layouts/AppLayout.svelte'
   import {
     Categories16,
     Category16,
     Favorite24,
-    Favorite32,
     FavoriteFilled24,
   } from 'carbon-icons-svelte'
   import { flip } from 'svelte/animate'
   import { expoOut } from 'svelte/easing'
   import { fly } from 'svelte/transition'
 
-  $: store = $page.stuff.store!
+  $: categories = $page.stuff.categories || []
 
   export let products: StripedProduct[] = []
   export let category: string = ''
@@ -67,7 +66,7 @@
           <Categories16 />
           <span> All categories</span>
         </a>
-        <!-- {#each store?.categories || [] as category}
+        {#each categories as category}
           <a
             href={getCategoryLink(category.slug)}
             sveltekit:prefetch
@@ -79,7 +78,7 @@
               {category.name}
             </span>
           </a>
-        {/each} -->
+        {/each}
       </div>
     </div>
   </div>
@@ -93,31 +92,33 @@
           class="bg-white border rounded-lg cursor-pointer flex flex-col space-y-2 border-gray-300 p-2 transform transition-all relative dark:bg-dark-800 dark:border-dark-400 hover:shadow-lg hover:scale-102"
           animate:flip={{ duration: 400, easing: expoOut }}
           style="will-change: transform"
-          on:click={() => goto(`/products/${p.slug}`)}
+          on:click={() => goto(`/menu/${p.slug}`)}
         >
           <!-- {#if p.template} -->
-          <div
-            class="flex h-full w-full pointer-events-none aspect-square"
-            use:squareratio
-          >
-            <!-- <TemplatePreview
-                lazy
-                watermark
-                showFonts
-                template={p.template}
-                controls={false}
-              /> -->
+          <div class="flex h-full w-full aspect-square" use:squareratio>
+            <Image
+              src={p?.meta.images[0].url || ''}
+              class="rounded checkerboard"
+              width="480"
+              height="480"
+              options={{
+                rs: {
+                  s: '480x480',
+                  m: 'scale',
+                },
+              }}
+            />
           </div>
           <!-- {/if} -->
           <div class="flex flex-col flex-grow h-full space-y-1 justify-between">
             <div class="flex flex-col space-y-1">
               <a
-                href="/products/{p.slug}"
+                href="/menu/{p.slug}"
                 class="font-bold text-sm <sm:text-xl hover:underline"
                 >{p.name}</a
               >
               <a
-                href="/products?category={p.storeCategory?.slug}"
+                href="/menu?category={p.storeCategory?.slug}"
                 class="text-xs text-blue-500 hover:underline"
                 >{p.storeCategory?.name}</a
               >

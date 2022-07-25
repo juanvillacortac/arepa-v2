@@ -186,29 +186,25 @@
           </label>
         {/if}
       </div>
-      <button
-        class="rounded flex font-bold mr-auto bg-dark-800 text-sm py-2 px-6 transform-gpu duration-200 !text-white hover:shadow disabled:cursor-not-allowed disabled:opacity-70 not-disabled:hover:-translate-y-px"
-        disabled={loading}
-        type="submit"
-        >{loading ? 'Loading...' : isLogin ? 'Log in' : 'Register'}</button
-      >
-      <div class="flex space-x-2 text-sm pt-2 items-center">
+      <div class="flex space-x-2 text-sm text-right w-full pb-2 justify-end">
         {#if isLogin}
           <span>Don't have an account yet?</span>
-          <a
-            href="?register"
-            class="font-bold text-red-900 dark:text-red-500 hover:underline"
+          <a href="?register" class="font-bold text-blue-500 hover:underline"
             >Create account</a
           >
         {:else}
           <span>Do you have an account?</span>
-          <a
-            href="/login"
-            class="font-bold text-red-900 dark:text-red-500 hover:underline"
+          <a href="/login" class="font-bold text-blue-500 hover:underline"
             >Log in</a
           >
         {/if}
       </div>
+      <button
+        class="rounded flex font-bold ml-auto bg-dark-800 text-xs text-white py-2 px-6 transform-gpu duration-200 dark:(bg-gray-100 text-dark-900) hover:shadow disabled:cursor-not-allowed disabled:opacity-70 not-disabled:hover:-translate-y-px "
+        disabled={loading}
+        type="submit"
+        >{loading ? 'Loading...' : isLogin ? 'Log in' : 'Register'}</button
+      >
     </form>
   </div>
 </div>

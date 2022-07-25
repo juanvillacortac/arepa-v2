@@ -95,9 +95,11 @@ specifiers:
   svelte-check: ^2.7.0
   svelte-datocms: ^0.6.3
   svelte-fullscreen: ^2.0.0
+  svelte-keyed: ^1.1.6
   svelte-kit-cookie-session: ^3.0.6
   svelte-markdown: ^0.2.2
   svelte-marquee-text-widget: ^1.1.0
+  svelte-parallax: ^0.5.2
   svelte-portal: ^2.2.0
   svelte-preprocess: ^4.10.6
   svelte-range-slider-pips: ^2.0.3
@@ -105,6 +107,7 @@ specifiers:
   svelte-splitpanes: ^0.6.3
   svelte-stripe: ^0.0.17
   svelte-windicss-preprocess: ~4.2.6
+  svelte-writable-derived: ^2.1.5
   svelte2tsx: ^0.4.14
   three: ^0.135.0
   tozod: ^3.0.0
@@ -195,14 +198,17 @@ dependencies:
   superjson: 1.9.1
   svelte-datocms: 0.6.3
   svelte-fullscreen: 2.0.0
+  svelte-keyed: 1.1.6_svelte@3.49.0
   svelte-kit-cookie-session: 3.0.6
   svelte-markdown: 0.2.2_svelte@3.49.0
   svelte-marquee-text-widget: 1.1.0
+  svelte-parallax: 0.5.2
   svelte-portal: 2.2.0
   svelte-range-slider-pips: 2.0.3
   svelte-split-pane: 0.1.2
   svelte-splitpanes: 0.6.5
   svelte-stripe: 0.0.17
+  svelte-writable-derived: 2.1.5_svelte@3.49.0
   three: 0.135.0
   tozod: 3.0.0_zod@3.17.3
   trpc-transformer: 2.0.2
@@ -4543,6 +4549,10 @@ packages:
     resolution: {integrity: sha512-r5wGx7YeOwNWNlCA0wQ86zKyDLMQr+/RB8xy74M4hTphfmjlijTSSXGuH8rnvKZnfT9i+75zmd8jcKdMR4O6jA==}
     dev: false
 
+  /focus-options-polyfill/1.6.0:
+    resolution: {integrity: sha512-uyrAmLZrPnUItQY5wTdg31TO9GGZRGsh/jmohUg9oLmLi/sw5y7LlTV/mwyd6rvbxIOGwmRiv6LcTS8w7Bk9NQ==}
+    dev: false
+
   /follow-redirects/1.15.1:
     resolution: {integrity: sha512-yLAMQs+k0b2m7cVxpS1VKJVvoz7SS9Td1zss3XRwXj+ZDH00RJgnuLx7E44wx02kQLrdM3aOOy+FpzS7+8OizA==}
     engines: {node: '>=4.0'}
@@ -7891,6 +7901,14 @@ packages:
       svelte: 3.49.0
     dev: true
 
+  /svelte-keyed/1.1.6_svelte@3.49.0:
+    resolution: {integrity: sha512-sd/7j3waSpOkeiQqATstlvNySbEpSs49aoaZ/nc09x/iEndnXQ/9Zy5PTD06+C7hlZk8KjZ4bhrktAQ791jWMQ==}
+    peerDependencies:
+      svelte: ^3.49.0
+    dependencies:
+      svelte: 3.49.0
+    dev: false
+
   /svelte-kit-cookie-session/3.0.6:
     resolution: {integrity: sha512-8HmnhTxLgf2nqNTW22FwzzXHepdN7gLXH5mBU1zhZX93JXyq/OOLsgbWhX9Hv9JNUlYknwq/ZE54iMrEFaH5BA==}
     dependencies:
@@ -7909,6 +7927,12 @@ packages:
 
   /svelte-marquee-text-widget/1.1.0:
     resolution: {integrity: sha512-mBO3fBA++Xwn7P1VdgeH4OI+MrulxxNrGwdX7NVA1GU1ZCyrQUcb7AD8V3s6s2ZWW3cRXVhbBmgXW+aABYV9kA==}
+    dev: false
+
+  /svelte-parallax/0.5.2:
+    resolution: {integrity: sha512-LrO9Rh8jZQxGes2/Rp+zKxKHm4IEwNdDoNrAheY04UJUi1RTugBrYf+MImwlsuauwRGuokdyG7CVHTrMFc+8pQ==}
+    dependencies:
+      focus-options-polyfill: 1.6.0
     dev: false
 
   /svelte-portal/2.2.0:
@@ -7991,6 +8015,14 @@ packages:
       windicss: 3.2.1
       windicss-runtime-dom: 3.0.0
     dev: true
+
+  /svelte-writable-derived/2.1.5_svelte@3.49.0:
+    resolution: {integrity: sha512-g26/W1iWj7FlLwaggNwXxHwMSf70/bHAYcpBT/EijijjakCSU9/PXmn31fL/kw2P1SzVEU6ayyCFuNYqTY3RUw==}
+    peerDependencies:
+      svelte: ^3.2.1
+    dependencies:
+      svelte: 3.49.0
+    dev: false
 
   /svelte/3.49.0:
     resolution: {integrity: sha512-+lmjic1pApJWDfPCpUUTc1m8azDqYCG1JN9YEngrx/hUyIcFJo6VZhj0A1Ai0wqoHcEIuQy+e9tk+4uDgdtsFA==}

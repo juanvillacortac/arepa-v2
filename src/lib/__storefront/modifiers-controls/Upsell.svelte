@@ -20,7 +20,7 @@
     o: 'png',
     rs: {
       s: '480x480',
-      m: 'embed',
+      m: 'scale',
       b: '000000.0',
     },
   }
@@ -35,7 +35,7 @@
     {#each list || [] as i}
       {@const selected = value.itemIds?.includes(i.id)}
       <div
-        class="border rounded-lg w-full transform transition-transform duration-200 relative dark:border-dark-700"
+        class="border rounded-lg w-full transform transition-transform duration-200 relative dark:border-dark-400"
         class:hover:scale-102={!disabled}
         style="will-change: transform"
         class:!shadow={selected}
@@ -80,9 +80,9 @@
             </div>
             <div class="flex flex-col">
               <h3 class="font-bold text-sm">{i.name}</h3>
-              {#if i.meta.description}
+              {#if i.meta?.description}
                 <p
-                  class="text-sm leading-none pb-1 overflow-hidden overflow-ellipsis whitespace-nowrap"
+                  class="text-xs leading-none pb-1 overflow-hidden overflow-ellipsis whitespace-nowrap"
                 >
                   {i.meta?.description}
                 </p>

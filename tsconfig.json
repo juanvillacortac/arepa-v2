@@ -10,18 +10,17 @@
 			to enforce using \`import type\` instead of \`import\` for Types.
 			*/
     "importsNotUsedAsValues": "error",
-    "isolatedModules": true,
     "resolveJsonModule": true,
     /**
 			To have warnings/errors of the Svelte compiler at the correct position,
 			enable source maps by default.
 			*/
     "sourceMap": true,
+    "outDir": "./.svelte-kit",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
-    "outDir": "dist",
     "strictNullChecks": true,
     "allowJs": true,
     "checkJs": true,

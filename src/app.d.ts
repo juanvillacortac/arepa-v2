@@ -18,14 +18,17 @@ declare namespace App {
 
     subtitle?: string
   }
-  interface Stuff extends Record<string, unknown> {
-    layout: import('$lib/utils/layout').LayoutType
-    product?: import('$lib/db').Product | null
-    products?: import('$lib/db').StripedProduct[] | null
-  }
+  interface Stuff extends LayoutData {}
 }
 
 interface SessionData {
   userId?: string | null
   customerId?: string | null
+}
+
+interface LayoutData extends Record<string, unknown> {
+  layout: import('$lib/utils/layout').LayoutType
+  product?: import('$lib/db').Product | null
+  categories?: import('$lib/trpc/client').InferQueryOutput<'products:categories:list'>
+  products?: import('$lib/db').StripedProduct[] | null
 }

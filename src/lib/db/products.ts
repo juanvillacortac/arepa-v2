@@ -345,3 +345,84 @@ export const upsertProduct = async (
     },
   })) as unknown as Product
 }
+
+export const listCategories = (visible?: boolean) =>
+  prisma.storeCategory.findMany({
+    where: {
+      visible,
+    },
+    include: {
+      _count: {
+        select: {
+          products: true,
+        },
+      },
+    },
+    orderBy: {
+      ordinal: 'asc',
+    },
+  })
+
+export const upsertStoreCategory = async (
+  category: Partial<Omit<StoreCategory, 'slug'>>
+): Promise<StoreCategory> => {
+  let c: StoreCategory | null
+  if (category.id) {
+    c = await prisma.storeCategory.findFirst({
+      where: { id: category.id },
+    })
+    if (!c || !category.id) {
+      throw new Error('not allowed')
+    }
+    let slug = c.slug
+    if (category.name) {
+      slug = slugify(category.name)
+      const coincidences = await prisma.storeCategory.findMany({
+        where: {
+          slug: {
+            startsWith: slug,
+          },
+          id: {
+            not: category.id,
+          },
+        },
+      })
+      if (coincidences.length) {
+        slug = `${slug}-${coincidences.length}`
+      }
+    }
+    return await prisma.storeCategory.update({
+      where: {
+        id: c.id,
+      },
+      data: {
+        name: category.name,
+        ordinal: category.ordinal,
+        visible: category.visible,
+        slug,
+      },
+    })
+  }
+  if (!category.name) {
+    throw new Error('not allowed')
+  }
+  let slug = slugify(category.name)
+  const coincidences = await prisma.storeCategory.findMany({
+    where: {
+      slug: {
+        startsWith: slug,
+      },
+    },
+  })
+  if (coincidences.length) {
+    slug = `${slug}-${coincidences.length}`
+  }
+  const count = await prisma.storeCategory.count()
+  return await prisma.storeCategory.create({
+    data: {
+      name: category.name,
+      ordinal: count + 1,
+      slug,
+    },
+  })
+}

@@ -41,6 +41,7 @@
     Subtract16,
   } from 'carbon-icons-svelte'
   import ModifiersControls from '$lib/__storefront/ModifiersControls.svelte'
+  import { scale } from 'svelte/transition'
 
   export let product!: Product
 
@@ -56,6 +57,9 @@
   $: if (browser && $bag && modifiers) {
     inBag = bag.existInBag(product, modifiers)
   }
+
+  let imageIdx = 0
+  $: image = product.meta?.images[imageIdx]?.url || ''
 </script>
 
 <div class="flex flex-col mx-auto space-y-2 w-full py-4 px-4 lg:max-w-9/10">
@@ -71,6 +75,49 @@
   </div>
   <div class="flex lg:items-center lg:justify-between <lg:flex-col" />
   <div class="grid gap-4 grid-cols-1 items-start lg:grid-cols-2">
+    <div class="flex flex-col space-y-2 w-full">
+      {#key image}
+        <div in:scale={{ start: 1.01, duration: 400 }}>
+          <Image
+            width="480"
+            height="320"
+            options={{
+              rs: {
+                s: '480x320',
+                m: 'scale',
+              },
+            }}
+            src={image}
+            class="rounded-lg object-cover w-full"
+          />
+        </div>
+      {/key}
+      <div class="w-full grid gap-2 grid-cols-6">
+        {#each product.meta?.images || [] as { url }, idx}
+          <div
+            class="border rounded-lg bg-gray-100 p-1 transform duration-200 overflow-hidden filter dark:bg-dark-400 dark:border-dark-400 hover:scale-102"
+            class:!border-blue-500={idx == imageIdx}
+            class:shadow={idx == imageIdx}
+            class:scale-102={idx == imageIdx}
+            class:grayscale={idx != imageIdx}
+            on:click={() => (imageIdx = idx)}
+          >
+            <Image
+              width="200"
+              height="200"
+              options={{
+                rs: {
+                  s: '200x200',
+                  m: 'scale',
+                },
+              }}
+              class="rounded {idx != imageIdx ? 'opacity-50' : ''}"
+              src={url}
+            />
+          </div>
+        {/each}
+      </div>
+    </div>
     <!-- {#if product.template && product.type === 'template'}
       <TemplatePreview watermark {template} mockups={product.meta?.mockups} />
     {/if} -->
@@ -88,6 +135,9 @@
           <div class="font-bold text-lg text-black dark:text-white">
             Total: ${total.toLocaleString()}
           </div>
+        </div>
+        <div class="border-t py-4 prose-sm !w-full dark:border-dark-400">
+          <Markdown source={product.description || 'No description'} />
         </div>
         <div class="flex w-full lg:w-7/10">
           <ModifiersControls bind:product bind:modifiers />
@@ -126,7 +176,7 @@
           <div class="flex space-x-4 w-full items-center">
             <div class="flex space-x-2">
               <button
-                class="rounded flex font-bold space-x-2 bg-dark-800 shadow text-white text-sm py-4 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105 active:not-disabled:scale-95"
+                class="rounded flex font-bold space-x-2 bg-dark-800 shadow text-white text-sm py-4 px-4 transform duration-200 items-center dark:(bg-gray-100 text-dark-900) disabled:cursor-not-allowed hover:not-disabled:scale-105 active:not-disabled:scale-95 "
                 on:click={() => bag.addToBag(product, modifiers, quantity)}
                 style="will-change: transform"
               >
@@ -135,7 +185,7 @@
               >
               {#if inBag}
                 <a
-                  class="rounded flex font-bold space-x-2 bg-dark-800 shadow text-white text-sm py-4 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
+                  class="rounded flex font-bold space-x-2 bg-dark-800 shadow text-white text-sm py-4 px-4 transform duration-200 items-center dark:(bg-gray-100 text-dark-900) disabled:cursor-not-allowed hover:not-disabled:scale-105 "
                   href="/bag?checkout"
                   style="will-change: transform"
                 >
@@ -167,65 +217,6 @@
           </div>
           <div class="font-bold text-lg text-black dark:text-white">
             Total ${total.toLocaleString()}
-          </div>
-        </div>
-        <Image
-          src="https://cdn.shopify.com/s/files/1/0263/8249/9885/t/2/assets/checkout_icon.png?v=172537687083778273411570901059"
-          class="ml-auto w-full sm:w-3/4"
-          options={{
-            q: 100,
-          }}
-        />
-        <div class="border-t pt-4 pb-2 prose-sm !w-full dark:border-dark-400">
-          <Markdown source={product.description || 'No description'} />
-        </div>
-        <div
-          class="border-t flex flex-col space-y-4 pt-4 items-center !w-full dark:border-dark-400"
-        >
-          <p class="text-center">4 Great reasons to buy from us:</p>
-          <div
-            class="text-sm text-center w-full grid gap-4 grid-cols-4 self-start lg:w-3/4"
-          >
-            <div class="flex flex-col space-y-2">
-              <Image
-                src="https://cdn.shopify.com/s/files/1/0263/8249/9885/t/2/assets/topreasons_1_image_150x.png?v=96138826798940876551601679670"
-                class="w-full"
-                options={{
-                  q: 100,
-                }}
-              />
-              <p>Free shipping with Canada Post (when you spend over $35)</p>
-            </div>
-            <div class="flex flex-col space-y-2">
-              <Image
-                src="https://cdn.shopify.com/s/files/1/0263/8249/9885/t/2/assets/topreasons_2_image_150x.png?v=56700843281458722951601679057"
-                class="w-full"
-                options={{
-                  q: 100,
-                }}
-              />
-              <p>Made in Canada</p>
-            </div>
-            <div class="flex flex-col space-y-2">
-              <Image
-                src="https://cdn.shopify.com/s/files/1/0263/8249/9885/t/2/assets/topreasons_4_image_150x.png?v=136892144237653317881601679058"
-                class="w-full"
-                options={{
-                  q: 100,
-                }}
-              />
-              <p>Canadian Company</p>
-            </div>
-            <div class="flex flex-col space-y-2">
-              <Image
-                src="https://cdn.shopify.com/s/files/1/0263/8249/9885/t/2/assets/topreasons_5_image_150x.png?v=75465245928373080681601679672"
-                class="w-full"
-                options={{
-                  q: 100,
-                }}
-              />
-              <p>Secure Ordering</p>
-            </div>
           </div>
         </div>
       </div>

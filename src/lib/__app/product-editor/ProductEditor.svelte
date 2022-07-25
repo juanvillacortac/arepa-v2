@@ -4,11 +4,12 @@
   import { notifications } from '$lib/components/notifications'
   import { goto } from '$app/navigation'
   import {
-    Archive16,
+    Close24,
+    CloseOutline24,
+    CloseOutline32,
     Copy16,
+    Error32,
     Launch16,
-    Save16,
-    Template16,
     TrashCan16,
     View16,
     ViewOff16,
@@ -18,8 +19,18 @@
   import ProductMainFieldsEditor from './ProductMainFieldsEditor.svelte'
   import ProductImagesEditor from './ProductImagesEditor.svelte'
   import { getAbsoluteURL } from '$lib/utils/host'
-  import trpc, { invalidateQuery } from '$lib/trpc/client'
+  import trpc, {
+    invalidateQuery,
+    type InferQueryOutput,
+  } from '$lib/trpc/client'
   import Submenu from '$lib/components/Submenu.svelte'
+  import { onMount, setContext } from 'svelte'
+  import { writable } from 'svelte/store'
+  import { fade, fly, scale } from 'svelte/transition'
+  import { expoOut } from 'svelte/easing'
+  import { portal } from 'svelte-portal'
+  import Image from '$lib/components/caravaggio/Image.svelte'
+  import { flip } from 'svelte/animate'
 
   export let product: Partial<Product> = {
     price: 0.01,
@@ -27,74 +38,75 @@
     type: 'template',
   }
 
+  const categories = writable<InferQueryOutput<'products:categories:list'>>([])
+  setContext('categories', categories)
+
+  onMount(async () => {
+    $categories = await trpc().query('products:categories:list')
+  })
+
   let title = product.name
   let saving = false
 
   const validate = () => {
     if (!product.name?.trim()) {
-      alert('Product should have a title')
-      return false
+      return 'Product should have a title'
+    }
+    if (!product.meta?.images?.length) {
+      return 'Product should have a image at least'
     }
     for (let m of modifiers?.filter((m) => m.active)) {
       const items = m.items!.filter((i) => i.active)
       if (!m.name) {
-        alert('Modifiers should have a title')
-        return false
+        return 'Modifiers should have a title'
       }
       if (m.type == 'select' || m.type == 'font') {
         if (!items.length) {
-          alert('Selection and multiple selection modifier should have items')
-          return false
+          return 'Selection and multiple selection modifier should have items'
         }
         for (let i of items) {
           if (!i.name) {
-            alert('Modifier items should have a title')
-            return false
+            return 'Modifier items should have a title'
           }
         }
       }
       if (m.type == 'upsell') {
         if (!items.length) {
-          alert('Selection and multiple selection modifier should have items')
-          return false
+          return 'Selection and multiple selection modifier should have items'
         }
         for (let i of items) {
           if (!i.name) {
-            alert('Upsell product should have a name')
-            return false
+            return 'Upsell product should have a name'
           }
           if (!i.meta.image) {
-            alert('Upsell product should have an image')
-            return false
+            return 'Upsell product should have an image'
           }
         }
       }
       if (m.type == 'font') {
         for (let i of items) {
           if (!i.meta.url) {
-            alert('Font items should have a valid URL')
-            return false
+            return 'Font items should have a valid URL'
           }
         }
       }
       if (m.type == 'color') {
         for (let i of items) {
           if (!i.name) {
-            alert('Color items should have a value')
-            return false
+            return 'Color items should have a value'
           }
           if (!i.meta.name) {
-            alert('Color items should have a name')
-            return false
+            return 'Color items should have a name'
           }
         }
       }
     }
-    return true
+    return ''
   }
 
   const duplicate = async () => {
-    if (validate()) {
+    error = validate()
+    if (!error) {
       const data = await trpc().mutation('products:upsert', {
         data: {
           ...product,
@@ -108,7 +120,8 @@
   }
 
   const submit = async () => {
-    if (!validate()) {
+    error = validate()
+    if (error) {
       return
     }
     try {
@@ -172,7 +185,46 @@
   let modifiers: (ProductModifier & { internalId?: string })[] = [
     ...(product?.modifiers! || []),
   ]
+
+  let error = ''
+
+  let imageIdx = 0
+  $: image = product?.meta?.images[imageIdx]?.url || ''
 </script>
+
+{#if error}
+  <div
+    class="flex h-full w-full top-0 z-99 fixed items-center justify-center backdrop-filter backdrop-blur-md"
+    transition:fade={{ duration: 300, easing: expoOut }}
+    use:portal
+  >
+    <div
+      class="bg-black h-full w-full opacity-70 absolute"
+      on:click={() => (error = '')}
+    />
+    <div
+      class="bg-white rounded-xl flex flex-col space-y-4 shadow max-h-9/10 p-4 relative lg:max-w-4/10 dark:bg-dark-900"
+      style="will-change: transform"
+      transition:fly={{ y: 10, duration: 400, easing: expoOut }}
+    >
+      <div class="flex items-center justify-between">
+        <h4 class="font-bold text-xl text-black leading-thight dark:text-white">
+          Error
+        </h4>
+        <button on:click={() => (error = '')}><Close24 /></button>
+      </div>
+      <div class="flex space-x-4 items-center">
+        <CloseOutline32 class="h-48px text-red-500 w-48px" />
+        <div class="flex flex-col space-y-2">
+          <p class="font-bold">You have an error</p>
+          <p class="text-sm text-gray-500">
+            {error}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+{/if}
 
 <h2
   class="font-bold font-title mx-auto my-2 text-black text-xl w-full lg:max-w-10/10 dark:text-white"
@@ -298,29 +350,82 @@
       <ProductImagesEditor bind:product />
       <ProductModifiersEditor bind:modifiers disabled={product.archived} />
     </div>
-    <!-- {#if product.template && product.type === 'template'}
-      <TemplatePreview mockups={product.meta?.mockups} template={$editor} />
-    {/if} -->
+    <div class="flex flex-col space-y-2 p-px w-full">
+      {#key image}
+        <div in:scale|local={{ start: 1.01, duration: 400 }}>
+          {#if image}
+            <Image
+              width="480"
+              height="320"
+              options={{
+                rs: {
+                  s: '480x320',
+                  m: 'scale',
+                },
+              }}
+              src={image}
+              class="rounded object-cover w-full checkerboard"
+            />
+          {:else}
+            <div class="relative">
+              <div
+                class="rounded flex flex-col h-full space-y-2 w-full checkerboard absolute items-center justify-center"
+              >
+                <CloseOutline32 class="h-18 w-18" />
+                <div class="font-title font-bold text-xl">No image</div>
+              </div>
+              <Image
+                width="480"
+                height="320"
+                options={{
+                  rs: {
+                    s: '480x320',
+                    m: 'scale',
+                  },
+                }}
+                src=""
+                class="opacity-0"
+              />
+            </div>
+          {/if}
+        </div>
+      {/key}
+      {#if product.meta?.images.length}
+        <div class="w-full grid gap-2 grid-cols-6">
+          {#each product.meta?.images || [] as { url }, idx (url)}
+            <button
+              animate:flip={{ duration: 400, easing: expoOut }}
+              class="border rounded-lg bg-gray-100 p-1 transform duration-200 overflow-hidden filter dark:bg-dark-400 dark:border-dark-400 hover:scale-102"
+              class:!border-blue-500={idx == imageIdx}
+              class:shadow={idx == imageIdx}
+              class:scale-102={idx == imageIdx}
+              class:grayscale={idx != imageIdx}
+              title="View image"
+              on:click={() => (imageIdx = idx)}
+              type="button"
+              use:tooltip={{ show: imageIdx != idx }}
+            >
+              <Image
+                width="200"
+                height="200"
+                options={{
+                  rs: {
+                    s: '200x200',
+                    m: 'scale',
+                  },
+                }}
+                class="rounded {idx != imageIdx ? 'opacity-50' : ''}"
+                src={url}
+              />
+            </button>
+          {/each}
+        </div>
+      {/if}
+    </div>
   </div>
 </form>
 
 <style>
-  .preview-button {
-    @apply bg-white border-transparent rounded flex border-2 shadow p-1 transform transition-transform duration-200;
-  }
-
-  .preview-button:hover {
-    @apply -translate-y-px;
-  }
-
-  :global(.dark) .preview-button {
-    @apply border-transparent bg-dark-700 border-2  border-gray-300;
-  }
-
-  :global(.dark) .preview-button:hover {
-    @apply border-gray-300;
-  }
-
   .checkerboard {
     --black-cell: rgba(55, 65, 81, 0.2);
     background-image: linear-gradient(

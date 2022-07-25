@@ -8,11 +8,7 @@
       token: url.searchParams.get('token') || undefined,
     })
     const customer = await trpc(fetch).query('customer:whoami')
-    if (
-      !order ||
-      order.storeId != stuff?.store?.id ||
-      (customer && order.customerId != customer.id)
-    ) {
+    if (!order || (customer && order.customerId != customer.id)) {
       return {
         status: 404,
       }
@@ -52,7 +48,7 @@
     class="flex font-bold font-title text-black text-3xl items-center dark:text-white"
   >
     Order # <span
-      class="rounded font-mono font-normal bg-gray-100 text-lg leading-none ml-2 p-1 dark:bg-dark-600"
+      class="rounded font-mono font-normal bg-gray-100 text-lg leading-none ml-2 p-1 dark:bg-dark-100"
       >{order.id}</span
     >
   </h3>

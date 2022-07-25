@@ -11,6 +11,7 @@
   } from '$lib/utils/modifiers'
   import {
     Add16,
+    ArrowRight16,
     ArrowRight24,
     Subtract16,
     TrashCan16,
@@ -26,10 +27,10 @@
   import type { Prisma } from '@prisma/client'
   import { writable } from 'svelte/store'
   import Ufo from '$lib/components/__Ufo.svelte'
+  import Image from '$lib/components/caravaggio/Image.svelte'
   let mounted = false
   onMount(() => {
     const unsuscribe = bag.subscribe((items) => {
-      if (!$page.stuff.store) return
       loadProducts(items)?.then(async () => {
         if (mounted) return
         const flag = $page.url.searchParams.get('checkout')
@@ -169,9 +170,7 @@
   {/each}
 </svelte:head>
 
-{#if $page.stuff.store}
-  <BagItemDetails bind:item={details} on:change={changeItem} />
-{/if}
+<BagItemDetails bind:item={details} on:change={changeItem} />
 
 <CheckoutSidebar
   on:checkout={() => bag.clear()}
@@ -216,7 +215,7 @@
           in:slide|local={{ duration: 400, easing: expoOut }}
         >
           <div
-            class="divide-y border rounded-lg flex flex-col w-full max-h-50vh relative overflow-x-auto dark:divide-dark-700 dark:border-dark-700"
+            class="divide-y border rounded-lg flex flex-col w-full max-h-50vh relative overflow-x-auto dark:divide-dark-400 dark:border-dark-400"
           >
             {#key $disableTransition}
               {#each items as item, idx ($disableTransition ? idx : item.key)}
@@ -235,13 +234,22 @@
                       class="flex items-center sm:space-x-4 <lg:flex-col <lg:space-y-4"
                     >
                       <div
-                        class="rounded-lg bg-gray-100 w-full overflow-hidden pointer-events-none select-none sm:w-42 dark:bg-dark-800"
+                        class="rounded bg-gray-100 w-full overflow-hidden pointer-events-none select-none sm:w-42 dark:bg-dark-400"
                         style="aspect-ratio: 1/1"
                       >
                         <div
                           class="flex h-full w-full items-center justify-center"
                         >
                           {#if p}
+                            <Image
+                              src={p?.meta.images[0].url || ''}
+                              options={{
+                                rs: {
+                                  s: '480x480',
+                                  m: 'scale',
+                                },
+                              }}
+                            />
                             <!-- <TemplatePreview
                               lazy
                               showFonts
@@ -262,7 +270,7 @@
                         class="flex flex-col space-y-1 w-full whitespace-normal sm:w-48"
                       >
                         <a
-                          href="/products/{p?.slug}"
+                          href="/menu/{p?.slug}"
                           class="font-bold text-lg text-black leading-tight sm:text-xs dark:text-white hover:underline"
                         >
                           {p?.name}
@@ -398,7 +406,7 @@
             </p>
           {/if}
           <button
-            class="rounded flex font-bold space-x-2 bg-dark-800 shadow text-white text-xl py-4 px-4 transform duration-200 items-center disabled:(cursor-not-allowed opacity-50) hover:not-disabled:scale-105 "
+            class="rounded-full flex font-bold space-x-2 bg-dark-800 shadow text-white text-xs p-2 transform duration-200 items-center dark:(bg-gray-100 text-dark-900) disabled:(cursor-not-allowed opacity-50) hover:not-disabled:scale-105 "
             style="will-change: transform"
             disabled={!loaded}
             on:click={() => {
@@ -407,7 +415,7 @@
             }}
           >
             <span>Checkout</span>
-            <ArrowRight24 class="m-auto" />
+            <ArrowRight16 class="m-auto" />
           </button>
         </div>
       {:else}

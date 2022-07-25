@@ -28,7 +28,7 @@ const config = {
       parameter: '_method',
       allowed: ['PUT', 'PATCH', 'DELETE'],
     },
-    inlineStyleThreshold: 48 / 0.0009765625,
+    inlineStyleThreshold: Infinity,
   },
 }
 

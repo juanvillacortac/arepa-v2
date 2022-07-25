@@ -65,9 +65,11 @@ model Account {
 
 model StoreCategory {
   id       String    @id @default(cuid())
-  slug     String
+  slug     String    @unique
   name     String
+  visible  Boolean   @default(true)
   products Product[]
+  ordinal  Int       @default(0)
 }
 
 enum ProductType {

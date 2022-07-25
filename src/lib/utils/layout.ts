@@ -41,27 +41,31 @@ export const validateLayoutRoute = (event: LoadEvent | RequestEvent) => {
   }
 }
 
-export type LayoutData = Partial<{
-  layout: import('$lib/utils/layout').LayoutType
-  product?: import('$lib/db').Product | null
-  products?: import('$lib/db').StripedProduct[] | null
-}>
-
 export const fetchLayoutData = async ({
   url,
   fetch,
   session,
-}: LoadEvent): Promise<{ response?: LayoutData; notFound?: boolean }> => {
+}: LoadEvent): Promise<{
+  response: LayoutData
+  notFound?: boolean
+}> => {
   const client = trpc(fetch)
+  const layout = session.layout
+  let response: LayoutData = {
+    layout,
+  }
   switch (session.layout) {
     case 'store':
       try {
-        let response: LayoutData = {}
-        return {}
+        const categories = await trpc().query('products:categories:list')
+        response.categories = categories
+        return {
+          response,
+        }
       } catch (err) {}
     default:
       return {
-        response: {},
+        response,
       }
   }
 }

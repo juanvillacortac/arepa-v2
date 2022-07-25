@@ -67,7 +67,7 @@
     document.documentElement.classList.toggle('dark', $preferences.darkMode)
 
   const fontsURL =
-    'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,900;1,700&family=Square+Peg&family=Roboto:wght@300;400;500;700;900&display=swap'
+    'https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,900;1,700&family=Pattaya&family=Square+Peg&family=Roboto:wght@300;400;500;700;900&display=swap'
 
   const fontsTag = `<link rel="preconnect" href="https://fonts.googleapis.com" />
   <link

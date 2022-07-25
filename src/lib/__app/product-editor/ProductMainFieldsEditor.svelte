@@ -2,12 +2,20 @@
   import { tooltip } from '$lib/components/tooltip'
 
   import type { Product } from '$lib/db'
+  import type { InferQueryOutput } from '$lib/trpc/client'
   import { Editor } from 'bytemd'
   import { ChevronRight16 } from 'carbon-icons-svelte'
+  import { getContext } from 'svelte'
   import { expoOut } from 'svelte/easing'
+  import { writable, type Writable } from 'svelte/store'
   import { slide } from 'svelte/transition'
 
   export let product: Partial<Product>
+
+  const categories =
+    getContext<Writable<InferQueryOutput<'products:categories:list'>>>(
+      'categories'
+    ) || writable([])
   let showing = false
 </script>
 
@@ -36,7 +44,7 @@
       class="flex flex-col space-y-4 <lg:pb-12"
       transition:slide|local={{ duration: 400, easing: expoOut }}
     >
-      <div class="grid gap-4 grid-cols-1 lg:grid-cols-3">
+      <div class="grid gap-4 grid-cols-1 xl:grid-cols-4">
         <div class="flex flex-col w-full">
           <label class="font-bold text-xs mb-2 block" for="fieldId">
             Product name
@@ -44,26 +52,12 @@
           <input
             class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline"
             type="text"
-            placeholder="Ex. Red camera sign"
+            placeholder="Ex. Reina Pepiada"
             required
             disabled={product.archived}
             bind:value={product.name}
           />
         </div>
-        {#if !product.id}
-          <div class="flex flex-col w-full">
-            <label class="font-bold text-xs mb-2 block" for="fieldId">
-              Product type
-            </label>
-            <select
-              class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline"
-              bind:value={product.type}
-            >
-              <option value={'template'}>Custom template</option>
-              <option value={'generic'}>Static product</option>
-            </select>
-          </div>
-        {/if}
         <div class="flex flex-col w-full">
           <label class="font-bold text-xs mb-2 block" for="fieldId">
             Product category
@@ -73,9 +67,9 @@
             bind:value={product.storeCategoryId}
             disabled={product.archived}
           >
-            <!-- {#each store?.categories || [] as category}
+            {#each $categories as category}
               <option value={category.id}>{category.name}</option>
-            {/each} -->
+            {/each}
           </select>
         </div>
         <div class="flex flex-col w-full">

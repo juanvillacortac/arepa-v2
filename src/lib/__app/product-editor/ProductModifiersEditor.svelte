@@ -106,30 +106,21 @@
       type: 'select',
       name: 'Selection',
       tree: SelectionTable,
-      embeddable: true,
-    },
-    {
-      type: 'font',
-      name: 'Font selection',
-      tree: FontTable,
-      embeddable: true,
     },
     // { type: 'multiple', name: 'Multiple selection' },
-    { type: 'text', name: 'Text', embeddable: true, icon: TextSelection16 },
-    { type: 'image', name: 'Image', embeddable: true, icon: Image16 },
+    { type: 'text', name: 'Text', icon: TextSelection16 },
+    { type: 'image', name: 'Image', icon: Image16 },
     {
       type: 'numeric',
       name: 'Numeric',
-      embeddable: true,
       icon: CharacterWholeNumber16,
     },
     {
       type: 'toggle',
       name: 'Toggle',
-      embeddable: true,
       icon: CheckboxChecked16,
     },
-    { type: 'color', name: 'Color', tree: ColorTable, embeddable: true },
+    { type: 'color', name: 'Color', tree: ColorTable },
     {
       type: 'upsell',
       name: 'Upselling',
@@ -315,20 +306,6 @@
                   </select>
                 </label>
               </div>
-              {#if modifierTypes?.find((t) => t.type === m.type)?.embeddable}
-                <div class="flex flex-col w-full">
-                  <label class="flex flex-col space-y-2">
-                    <span class="font-bold text-xs">Template accessor</span>
-                    <input
-                      type="text"
-                      placeholder="Template accessor"
-                      bind:value={m.templateAccessor}
-                      class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline"
-                      {disabled}
-                    />
-                  </label>
-                </div>
-              {/if}
             </div>
 
             {#if expanded && (expanded === m.internalId || expanded === m.id) && mType?.tree}

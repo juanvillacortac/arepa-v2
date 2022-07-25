@@ -21,6 +21,7 @@ export default defineConfig({
       },
       colors,
       fontFamily: {
+        handwritten: ['Pattaya', 'sans-serig'],
         title: ['Montserrat', 'sans-serif'],
         logo: ['Square Peg', 'sans-serif'],
       },

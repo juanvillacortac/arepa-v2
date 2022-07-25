@@ -78,8 +78,24 @@
       })
 
       const optimizedUrl = urlBuilder(url || '', options)
+      const optimizedUrl2 = urlBuilder(url || '', {
+        rs: {
+          s: '480x320',
+          m: 'scale',
+        },
+      })
+      const optimizedUrl3 = urlBuilder(url || '', {
+        rs: {
+          s: '200x200',
+          m: 'scale',
+        },
+      })
 
-      const _ = await loadImage(optimizedUrl)
+      const _ = await Promise.all([
+        loadImage(optimizedUrl),
+        loadImage(optimizedUrl2),
+        loadImage(optimizedUrl3),
+      ])
 
       images.update((img) => [...img, { path, url: url || '' }])
       expanded = true
@@ -200,6 +216,8 @@
         {#each $images as { path, url }, idx (path)}
           <div
             class="relative"
+            title="Drag to move"
+            use:tooltip={{ show: !hovering }}
             animate:flip={{ duration: 400, easing: expoOut }}
             draggable={!product.archived}
             on:dragstart|stopPropagation={(event) => dragstart(event, idx)}
@@ -227,7 +245,7 @@
               </button>
             {/if}
             <div
-              class="border-dashed rounded-lg flex border-2 overflow-hidden relative aspect-square dark:border-dark-700"
+              class="border-dashed rounded-lg flex border-2 overflow-hidden relative aspect-square dark:border-dark-300"
               use:squareratio
             >
               <div

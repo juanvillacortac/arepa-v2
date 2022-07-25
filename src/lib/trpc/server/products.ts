@@ -3,6 +3,24 @@ import * as trpc from '@trpc/server'
 import { z } from 'zod'
 import type { tRPCContext } from '.'
 
+const categories = trpc
+  .router<tRPCContext>()
+  .mutation('upsert', {
+    input: z.object({
+      id: z.string().cuid().optional(),
+      name: z.string().optional(),
+      visible: z.boolean().optional(),
+      ordinal: z.number().int().optional(),
+    }),
+    resolve: async ({ input }) => {
+      return await db.upsertStoreCategory(input)
+    },
+  })
+  .query('list', {
+    input: z.boolean().optional().describe('visible'),
+    resolve: ({ input }) => db.listCategories(input),
+  })
+
 const mutations = trpc.router<tRPCContext>().mutation('upsert', {
   input: (input: { data: Partial<db.Product> }) => input,
   resolve: async ({ ctx, input }) => {
@@ -53,4 +71,8 @@ const queries = trpc
     },
   })
 
-export default trpc.router<tRPCContext>().merge(mutations).merge(queries)
+export default trpc
+  .router<tRPCContext>()
+  .merge(mutations)
+  .merge(queries)
+  .merge('categories:', categories)

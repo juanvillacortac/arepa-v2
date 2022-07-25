@@ -42,6 +42,12 @@ export async function login({
     }
     uid = userFound.id
   } else if (!isLogin) {
+    const count = await prisma.user.count()
+    if (count) {
+      throw {
+        error: "You can't create a new account",
+      }
+    }
     const hashedPassword = await hashPassword(password)
     const user = await prisma.user.create({
       data: {

@@ -1,5 +1,7 @@
 <script lang="ts">
   import { browser } from '$app/env'
+  import Image from '$lib/components/caravaggio/Image.svelte'
+  import { tooltip } from '$lib/components/tooltip'
   import type { Product } from '$lib/db'
   import type { BagItem } from '$lib/stores'
   import trpc from '$lib/trpc/client'
@@ -11,9 +13,10 @@
   import type { Prisma } from '@prisma/client'
   import { Close24 } from 'carbon-icons-svelte'
   import { createEventDispatcher, onDestroy, onMount } from 'svelte'
+  import SvelteMarkdown from 'svelte-markdown'
   import { portal } from 'svelte-portal'
   import { elasticOut, expoOut } from 'svelte/easing'
-  import { fade, scale } from 'svelte/transition'
+  import { fade, fly, scale } from 'svelte/transition'
   import ModifiersControls from './ModifiersControls.svelte'
 
   export let item:
@@ -93,23 +96,24 @@
     item = undefined
     product = undefined
     fields = ''
+    imageIdx = 0
     $modifiers = {}
   }
+
+  let imageIdx = 0
+  $: image = product?.meta?.images[imageIdx]?.url || ''
 </script>
 
 {#if item && product}
   <div
-    class="flex h-full w-full top-0 z-99 fixed items-center justify-center"
+    class="flex h-full w-full top-0 z-99 fixed items-center justify-center backdrop-filter backdrop-blur-md"
     use:portal
+    transition:fade={{ duration: 400, easing: expoOut }}
   >
-    <div
-      class="bg-black h-full w-full opacity-70 absolute"
-      on:click={close}
-      transition:fade={{ duration: 400, easing: expoOut }}
-    />
+    <div class="bg-black h-full w-full opacity-70 absolute" on:click={close} />
     <div
       class="bg-white rounded-xl flex flex-col space-y-4 shadow max-h-9/10 p-4 w-9/10 relative lg:w-8/10 dark:bg-dark-900"
-      transition:scale={{ start: 0.9, duration: 400, easing: expoOut }}
+      transition:fly={{ y: 10, duration: 400, easing: expoOut }}
     >
       <div class="flex items-center justify-between">
         <h4 class="font-bold text-xl text-black leading-thight dark:text-white">
@@ -123,18 +127,51 @@
         <!-- {#if product?.template && product?.type === 'template'} -->
         <div class="lg:top-0 lg:sticky <lg:relative">
           {#if product}
-            <!-- <TemplatePreview
-                watermark
-                template={{
-                  ...(product?.template || {}),
-                  fields,
-                }}
-                mockups={product.meta?.mockups}
-              /> -->
-          {:else}
-            <div
-              class="rounded-lg flex h-full w-full absolute aspect-square skeleton"
-            />
+            <div class="flex flex-col space-y-2 p-px w-full">
+              {#key image}
+                <div in:scale={{ start: 1.01, duration: 400 }}>
+                  <Image
+                    width="480"
+                    height="320"
+                    options={{
+                      rs: {
+                        s: '480x320',
+                        m: 'scale',
+                      },
+                    }}
+                    src={image}
+                    class="rounded-lg object-cover w-full checkerboard"
+                  />
+                </div>
+              {/key}
+              <div class="w-full grid gap-2 grid-cols-6">
+                {#each product.meta?.images || [] as { url }, idx}
+                  <button
+                    class="border rounded-lg bg-gray-100 p-1 transform duration-200 overflow-hidden filter dark:bg-dark-400 dark:border-dark-400 hover:scale-102"
+                    class:!border-blue-500={idx == imageIdx}
+                    class:shadow={idx == imageIdx}
+                    class:scale-102={idx == imageIdx}
+                    class:grayscale={idx != imageIdx}
+                    title="View image"
+                    on:click={() => (imageIdx = idx)}
+                    use:tooltip={{ show: imageIdx != idx }}
+                  >
+                    <Image
+                      width="200"
+                      height="200"
+                      options={{
+                        rs: {
+                          s: '200x200',
+                          m: 'scale',
+                        },
+                      }}
+                      class="rounded {idx != imageIdx ? 'opacity-50' : ''}"
+                      src={url}
+                    />
+                  </button>
+                {/each}
+              </div>
+            </div>
           {/if}
         </div>
         <!-- {/if} -->
@@ -168,6 +205,13 @@
                   {disabled}
                 />
               {/if}
+            </div>
+            <div
+              class="border-t pt-4 pb-2 prose-sm !w-full dark:border-dark-400"
+            >
+              <SvelteMarkdown
+                source={product.description || 'No description'}
+              />
             </div>
           {/if}
         </div>

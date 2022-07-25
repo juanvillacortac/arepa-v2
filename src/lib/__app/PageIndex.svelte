@@ -2,6 +2,7 @@
   import { pageSubtitle } from '$lib'
   import {
     Category32,
+    ColorPalette32,
     OrderDetails32,
     Product32,
     Settings32,
@@ -28,6 +29,11 @@
       icon: UserAvatar32,
       title: 'Customers',
       href: `/customers`,
+    },
+    {
+      icon: ColorPalette32,
+      title: 'Customize landing',
+      href: `/landing`,
     },
     {
       icon: Settings32,

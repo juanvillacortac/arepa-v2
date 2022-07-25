@@ -39,6 +39,7 @@
   import { getTotalFromProductModifiers } from '$lib/utils/modifiers'
   import { page } from '$app/stores'
   import { customer, redisWritable } from '$lib/stores'
+  import { portal } from 'svelte-portal'
 
   const countries = getCountries()
 
@@ -47,11 +48,11 @@
 
   const stripeKey = redisWritable<string | undefined>(
     undefined,
-    `stripe:public-key:${$page.stuff.store?.id}`
+    `stripe:public-key`
   )
   const paypalKey = redisWritable<string | undefined>(
     undefined,
-    `paypal:client-id:${$page.stuff.store?.id}`
+    `paypal:client-id`
   )
 
   onMount(async () => {
@@ -71,17 +72,11 @@
     if (!order) return
     completedSteps = {
       billing: Boolean(order.billingData?.email),
-      shipping: Boolean(order.shippingData?.email),
       payment: false,
     }
     billing = order.billingData
-    shipping = completedSteps.shipping ? order.shippingData : shipping
-    mergeAddress = !completedSteps.shipping
-    step = completedSteps.shipping
-      ? completedSteps.billing
-        ? 'payment'
-        : 'shipping'
-      : 'billing'
+    mergeAddress = true
+    step = completedSteps.billing ? 'payment' : 'billing'
   }
 
   $: if (open) {
@@ -155,7 +150,7 @@
   }
 
   const createPaymentIntent = () =>
-    trpc().mutation('stores:payment:createStripeIntent', {
+    trpc().mutation('utils:stripe:createIntent', {
       amount: total,
       currency: 'usd',
     })
@@ -165,7 +160,6 @@
 
   let completedSteps: Record<typeof step, boolean> = {
     billing: false,
-    shipping: false,
     payment: false,
   }
 
@@ -256,7 +250,6 @@
       } else {
         waiting = true
         order = await trpc().mutation('orders:create', {
-          storeId: $page.stuff.store!.id,
           order: {
             customerId: $customer?.id || undefined,
             status: 'pending',
@@ -282,12 +275,6 @@
         case 'billing':
           if (!completedSteps.billing) {
             completedSteps.billing = true
-          }
-          step = 'shipping'
-          break
-        case 'shipping':
-          if (!completedSteps.shipping) {
-            completedSteps.shipping = true
           }
           step = 'payment'
           await tick()
@@ -319,7 +306,6 @@
         error = result.error
         return
       }
-      console.log(order)
       if (order) {
         confirmPayment({
           amount: total,
@@ -401,7 +387,7 @@
     }
   }
 
-  let step: 'billing' | 'shipping' | 'payment' = 'billing'
+  let step: 'billing' | 'payment' = 'billing'
 
   let mergeAddress = true
 
@@ -447,7 +433,7 @@
   }
 
   const changeStep = async (to: typeof step) => {
-    if (to == 'payment' && completedSteps.billing && completedSteps.shipping) {
+    if (to == 'payment' && completedSteps.billing) {
       step = to
       tick().then(() => {
         paypalButtonComponent = createPaypalButton(total)
@@ -466,614 +452,421 @@
 </script>
 
 {#if open}
-  <div class="contents">
-    <form
-      on:submit|preventDefault={submit}
-      class="bg-white border-l flex-grow h-full shadow-xl top-0 ease-out right-0 z-100 fixed sm:w-1/2 <sm:w-full lg:w-1/3 dark:bg-dark-800 dark:border-dark-700"
-      style="will-change: transform"
-      transition:fly|local={{ x: '100%', opacity: 1, duration: 400 }}
-    >
-      {#if waiting}
-        <div
-          class="bg-white flex h-full w-full z-110 absolute items-center justify-center !bg-opacity-50 dark:bg-dark-900"
-          transition:fade={{ duration: 200 }}
+  <form
+    on:submit|preventDefault={submit}
+    class="bg-white border-l flex-grow h-full shadow-xl top-0 ease-out right-0 z-100 fixed sm:w-1/2 <sm:w-full lg:w-1/3 dark:bg-dark-800 dark:border-dark-400"
+    style="will-change: transform"
+    transition:fly|local={{ x: '100%', opacity: 1, duration: 400 }}
+  >
+    {#if waiting}
+      <div
+        class="bg-white flex h-full w-full z-110 absolute items-center justify-center !bg-opacity-50 dark:bg-dark-900"
+        transition:fade={{ duration: 200 }}
+      >
+        <Hourglass32
+          class="h-48px w-48px roll !animate-loop !animate-duration-1500"
+        />
+      </div>
+    {/if}
+    <div class="flex flex-col h-full space-y-4 p-4 overflow-y-auto">
+      <div class="flex space-x-4 items-center">
+        <button
+          type="reset"
+          class="transform transition-transform duration-200 hover:scale-80"
+          on:click={() => {
+            open = false
+            payment = false
+            done = undefined
+          }}
         >
-          <Hourglass32
-            class="h-48px w-48px roll !animate-loop !animate-duration-1500"
-          />
-        </div>
-      {/if}
-      <div class="flex flex-col h-full space-y-4 p-4 overflow-y-auto">
-        <div class="flex space-x-4 items-center">
-          <button
-            type="reset"
-            class="transform transition-transform duration-200 hover:scale-80"
-            on:click={() => {
-              open = false
-              payment = false
-              done = undefined
+          <Close24 />
+        </button>
+        <div class="font-title font-bold text-2xl">Checkout</div>
+      </div>
+      {#if (done || done == 0) && placedOrder}
+        <div
+          class="flex flex-col h-full space-y-4 w-full items-center justify-center"
+        >
+          <div
+            class="w-4/10 aspect-square"
+            use:squareratio
+            in:scale={{
+              easing: elasticOut,
+              start: 0,
+              duration: 800,
+              opacity: 1,
             }}
           >
-            <Close24 />
-          </button>
-          <div class="font-title font-bold text-2xl">Checkout</div>
+            <CheckmarkFilled32 class="h-full w-full text-green-500" />
+          </div>
+          <p
+            class="font-bold text-center text-2xl"
+            in:fly={{
+              delay: 200,
+              duration: 400,
+              y: '1.5rem',
+            }}
+          >
+            Thank you!
+          </p>
+          <p
+            class="font-bold text-center w-9/10"
+            in:fly={{
+              delay: 300,
+              duration: 400,
+              y: '1.5rem',
+            }}
+          >
+            Your order <span
+              class="rounded font-mono font-bold bg-gray-200 text-xs leading-none p-[0.2rem] dark:bg-dark-100"
+              >#{placedOrder.id}</span
+            >
+            for ${placedOrder.total.toLocaleString('en', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })} was succesfully placed
+          </p>
+          <p
+            class="text-sm text-center text-gray-500 w-9/10"
+            in:fly={{
+              delay: 400,
+              duration: 400,
+              y: '1.5rem',
+            }}
+          >
+            We have just sent an email to <span class="font-bold"
+              >{placedOrder.customer?.email ||
+                placedOrder.billingData.email}</span
+            >
+            with details about the order. You can also track the order
+            <a
+              class="text-blue-500 hover:underline"
+              href="/account/orders/{placedOrder.id}{placedOrder.token
+                ? `?token=${placedOrder.token}`
+                : ''}">here</a
+            >
+          </p>
         </div>
-        {#if (done || done == 0) && placedOrder}
-          <div
-            class="flex flex-col h-full space-y-4 w-full items-center justify-center"
-          >
+      {:else}
+        <div
+          class="divide-y border rounded rounded-lg flex flex-col w-full dark:divide-dark-600 dark:border-dark-400"
+        >
+          {#if step !== 'payment'}
             <div
-              class="w-4/10 aspect-square"
-              use:squareratio
-              in:scale={{
-                easing: elasticOut,
-                start: 0,
-                duration: 800,
-                opacity: 1,
-              }}
+              class="flex space-x-2 w-full p-2 items-center justify-between"
+              transition:slide|local={{ duration: 400, easing: expoOut }}
             >
-              <CheckmarkFilled32 class="h-full w-full text-green-500" />
+              <input
+                type="text"
+                placeholder="Apply coupon code"
+                class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
+              />
+              <button
+                class="rounded flex font-bold space-x-2 bg-dark-800 shadow text-white text-xs py-2 px-4 transform duration-200 items-center dark:(bg-gray-100 text-dark-900) disabled:cursor-not-allowed hover:not-disabled:scale-105 "
+                style="will-change: transform"
+                type="button"
+              >
+                Apply
+              </button>
             </div>
-            <p
-              class="font-bold text-center text-2xl"
-              in:fly={{
-                delay: 200,
-                duration: 400,
-                y: '1.5rem',
-              }}
-            >
-              Thank you!
-            </p>
-            <p
-              class="font-bold text-center w-9/10"
-              in:fly={{
-                delay: 300,
-                duration: 400,
-                y: '1.5rem',
-              }}
-            >
-              Your order <span
-                class="rounded font-mono font-bold bg-dark-700 text-xs leading-none p-[0.2rem]"
-                >#{placedOrder.id}</span
-              >
-              for ${done.toLocaleString('en', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })} was succesfully placed
-            </p>
-            <p
-              class="text-sm text-center text-gray-500 w-9/10"
-              in:fly={{
-                delay: 400,
-                duration: 400,
-                y: '1.5rem',
-              }}
-            >
-              We have just sent an email to <span class="font-bold"
-                >{placedOrder.customer?.email ||
-                  placedOrder.billingData.email}</span
-              >
-              with details about the order. You can also track the order
-              <a
-                class="text-blue-500 hover:underline"
-                href="/account/orders/{placedOrder.id}{placedOrder.token
-                  ? `?token=${placedOrder.token}`
-                  : ''}">here</a
-              >
-            </p>
-          </div>
-        {:else}
-          <div
-            class="divide-y border rounded rounded-lg flex flex-col w-full dark:divide-dark-600 dark:border-dark-400"
-          >
-            {#if step !== 'payment'}
-              <div
-                class="flex space-x-2 w-full p-2 items-center justify-between"
-                transition:slide|local={{ duration: 400, easing: expoOut }}
-              >
-                <input
-                  type="text"
-                  placeholder="Apply coupon code"
-                  class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
-                />
-                <button
-                  class="rounded flex font-bold space-x-2 bg-dark-800 shadow text-white text-xs py-2 px-4 transform duration-200 items-center disabled:cursor-not-allowed hover:not-disabled:scale-105"
-                  style="will-change: transform"
-                  type="button"
-                >
-                  Apply
-                </button>
-              </div>
-            {/if}
-            <div class="flex flex-col font-bold space-y-4 text-xs p-2">
-              <div class="flex justify-between">
-                <div>Subtotal:</div>
-                <p>
-                  ${total.toLocaleString('en', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </p>
-              </div>
-            </div>
-            <div class="flex flex-col font-bold space-y-4 text-xs p-2">
-              <div class="flex justify-between">
-                <div>Shipping:</div>
-                <p>
-                  ${(0).toLocaleString('en', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </p>
-              </div>
-            </div>
-            <div class="flex flex-col font-bold space-y-4 text-xs p-2">
-              <div class="flex justify-between">
-                <div>Total:</div>
-                <p>
-                  ${total.toLocaleString('en', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </p>
-              </div>
+          {/if}
+          <div class="flex flex-col font-bold space-y-4 text-xs p-2">
+            <div class="flex justify-between">
+              <div>Subtotal:</div>
+              <p>
+                ${total.toLocaleString('en', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </p>
             </div>
           </div>
+          <div class="flex flex-col font-bold space-y-4 text-xs p-2">
+            <div class="flex justify-between">
+              <div>Total:</div>
+              <p>
+                ${total.toLocaleString('en', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </p>
+            </div>
+          </div>
+        </div>
 
+        <div
+          class="border rounded rounded-lg flex flex-col space-y-4 w-full p-2 dark:divide-dark-600 dark:border-dark-400"
+        >
           <div
-            class="border rounded rounded-lg flex flex-col space-y-4 w-full p-2 dark:divide-dark-600 dark:border-dark-400"
+            class="flex space-x-2 w-full items-center"
+            on:click={() => changeStep('billing')}
+            class:cursor-pointer={step != 'billing' && completedSteps.billing}
+            title="Change billing details"
+            use:tooltip={{
+              show: step != 'billing' && completedSteps.billing,
+            }}
           >
             <div
-              class="flex space-x-2 w-full items-center"
-              on:click={() => changeStep('billing')}
-              class:cursor-pointer={step != 'billing' && completedSteps.billing}
-              title="Change billing details"
-              use:tooltip={{
-                show: step != 'billing' && completedSteps.billing,
-              }}
+              class="border rounded-full flex font-bold font-title border-gray-300 h-8 text-xs w-8 items-center justify-center dark:border-dark-400"
+              class:!border-transparent={completedSteps.billing ||
+                step === 'billing'}
+              class:text-white={completedSteps.billing || step === 'billing'}
+              class:bg-dark-800={completedSteps.billing || step === 'billing'}
+              class:dark:bg-gray-100={completedSteps.billing ||
+                step === 'billing'}
+              class:dark:text-dark-900={completedSteps.billing ||
+                step === 'billing'}
             >
-              <div
-                class="border rounded-full flex font-bold font-title border-gray-300 h-8 text-xs w-8 items-center justify-center dark:border-dark-400"
-                class:!border-transparent={completedSteps.billing ||
-                  step === 'billing'}
-                class:text-white={completedSteps.billing || step === 'billing'}
-                class:bg-dark-800={completedSteps.billing || step === 'billing'}
-              >
-                1
-              </div>
-              <div class="font-bold font-title text-xs">Billing</div>
+              1
             </div>
-            {#if step === 'billing'}
-              <div
-                class="flex flex-col space-y-2"
-                transition:slide|local={{ duration: 400, easing: expoOut }}
-              >
-                <div class="flex space-x-3">
-                  <div class="flex flex-col w-full">
-                    <label class="font-bold text-xs mb-2 block" for="fieldId">
-                      Email *
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="Ex. juan@gmail.com"
-                      required
-                      class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
-                      bind:value={billing.email}
-                    />
-                  </div>
-                  <div class="flex flex-col w-full">
-                    <label class="font-bold text-xs mb-2 block" for="fieldId">
-                      Phone number
-                    </label>
-                    <input
-                      type="tel"
-                      placeholder="Ex. +1 XXXXXX"
-                      class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
-                      bind:value={billing.phone}
-                    />
-                  </div>
-                </div>
-                <div class="flex space-x-3">
-                  <div class="flex flex-col w-full">
-                    <label class="font-bold text-xs mb-2 block" for="fieldId"
-                      >First name *</label
-                    >
-                    <input
-                      type="text"
-                      required
-                      class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
-                      bind:value={billing.firstName}
-                    />
-                  </div>
-                  <div class="flex flex-col w-full">
-                    <label class="font-bold text-xs mb-2 block" for="fieldId"
-                      >Last name</label
-                    >
-                    <input
-                      type="text"
-                      class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
-                      bind:value={billing.lastName}
-                    />
-                  </div>
+            <div class="font-bold font-title text-xs">Billing</div>
+          </div>
+          {#if step === 'billing'}
+            <div
+              class="flex flex-col space-y-2"
+              transition:slide|local={{ duration: 400, easing: expoOut }}
+            >
+              <div class="flex space-x-3">
+                <div class="flex flex-col w-full">
+                  <label class="font-bold text-xs mb-2 block" for="fieldId">
+                    Email *
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="Ex. juan@gmail.com"
+                    required
+                    class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
+                    bind:value={billing.email}
+                  />
                 </div>
                 <div class="flex flex-col w-full">
                   <label class="font-bold text-xs mb-2 block" for="fieldId">
-                    Country/Region *
+                    Phone number
                   </label>
-                  <select
-                    class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline"
-                    required
-                    bind:value={billing.country}
-                  >
-                    <option value="" hidden />
-                    {#each countries as country}
-                      <option value={country.code}>{country.name}</option>
-                    {/each}
-                  </select>
-                </div>
-                <div class="flex space-x-3">
-                  <div class="flex flex-col w-full">
-                    <label class="font-bold text-xs mb-2 block" for="fieldId">
-                      Province/State *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
-                      bind:value={billing.province}
-                    />
-                  </div>
-                  <div class="flex flex-col w-full">
-                    <label class="font-bold text-xs mb-2 block" for="fieldId">
-                      Address *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
-                      bind:value={billing.address}
-                    />
-                  </div>
-                </div>
-                <div class="flex space-x-3">
-                  <div class="flex flex-col w-full">
-                    <label class="font-bold text-xs mb-2 block" for="fieldId"
-                      >City *</label
-                    >
-                    <input
-                      required
-                      type="text"
-                      class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
-                      bind:value={billing.city}
-                    />
-                  </div>
-                  <div class="flex flex-col w-full">
-                    <label class="font-bold text-xs mb-2 block" for="fieldId"
-                      >ZIP/Postal code *</label
-                    >
-                    <input
-                      type="text"
-                      required
-                      class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
-                      bind:value={billing.zip}
-                    />
-                  </div>
-                </div>
-                <button
-                  class="rounded flex font-bold space-x-2 border-blue-500 border-2 shadow text-xs text-center w-full py-2 px-4 text-blue-500 duration-200 justify-center items-center disabled:cursor-not-allowed disabled:opacity-75 hover:not-disabled:(bg-blue-500 text-white) "
-                  type="button"
-                  style="will-change: transform"
-                  disabled={detectingShipping}
-                  on:click={() => fillAddress('billing')}
-                >
-                  {detectingShipping
-                    ? 'Detecting...'
-                    : 'Detect address automatically'}
-                </button>
-              </div>
-            {/if}
-          </div>
-
-          <div
-            class="border rounded rounded-lg flex flex-col space-y-4 w-full p-2 dark:divide-dark-600 dark:border-dark-400"
-          >
-            <div
-              class="flex space-x-2 w-full items-center"
-              on:click={() => changeStep('shipping')}
-              class:cursor-pointer={step != 'shipping' &&
-                completedSteps.shipping}
-              title="Change shipping details"
-              use:tooltip={{
-                show: step != 'shipping' && completedSteps.shipping,
-              }}
-            >
-              <div
-                class="border rounded-full flex font-bold font-title border-gray-300 h-8 text-xs text-white w-8 items-center justify-center dark:border-dark-400"
-                class:!border-transparent={completedSteps.shipping ||
-                  step === 'shipping'}
-                class:text-white={completedSteps.shipping ||
-                  step === 'shipping'}
-                class:bg-dark-800={completedSteps.shipping ||
-                  step === 'shipping'}
-              >
-                2
-              </div>
-              <div class="font-bold font-title text-xs">Shipping</div>
-            </div>
-            {#if step === 'shipping'}
-              <div
-                class="flex flex-col space-y-4 w-full"
-                transition:slide|local={{ duration: 400, easing: expoOut }}
-              >
-                <label class="flex font-bold space-x-2 text-xs items-center">
-                  <span> Use billing address </span>
-                  <input type="checkbox" bind:checked={mergeAddress} />
-                </label>
-                {#if !mergeAddress}
-                  <div
-                    class="flex flex-col space-y-2"
-                    transition:slide|local={{ duration: 400, easing: expoOut }}
-                  >
-                    <div class="flex space-x-3">
-                      <div class="flex flex-col w-full">
-                        <label
-                          class="font-bold text-xs mb-2 block"
-                          for="fieldId"
-                        >
-                          Email *
-                        </label>
-                        <input
-                          type="email"
-                          placeholder="Ex. juan@gmail.com"
-                          required
-                          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
-                          bind:value={shipping.email}
-                        />
-                      </div>
-                      <div class="flex flex-col w-full">
-                        <label
-                          class="font-bold text-xs mb-2 block"
-                          for="fieldId"
-                        >
-                          Phone number
-                        </label>
-                        <input
-                          type="tel"
-                          placeholder="Ex. +1 XXXXXX"
-                          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
-                          bind:value={shipping.phone}
-                        />
-                      </div>
-                    </div>
-                    <div class="flex space-x-3">
-                      <div class="flex flex-col w-full">
-                        <label
-                          class="font-bold text-xs mb-2 block"
-                          for="fieldId">First name *</label
-                        >
-                        <input
-                          type="text"
-                          required
-                          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
-                          bind:value={shipping.firstName}
-                        />
-                      </div>
-                      <div class="flex flex-col w-full">
-                        <label
-                          class="font-bold text-xs mb-2 block"
-                          for="fieldId">Last name</label
-                        >
-                        <input
-                          type="text"
-                          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
-                          bind:value={shipping.lastName}
-                        />
-                      </div>
-                    </div>
-                    <div class="flex flex-col w-full">
-                      <label class="font-bold text-xs mb-2 block" for="fieldId">
-                        Country/Region *
-                      </label>
-                      <select
-                        class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline"
-                        required
-                        bind:value={shipping.country}
-                      >
-                        <option value="" hidden />
-                        {#each countries as country}
-                          <option value={country.code}>{country.name}</option>
-                        {/each}
-                      </select>
-                    </div>
-                    <div class="flex space-x-3">
-                      <div class="flex flex-col w-full">
-                        <label
-                          class="font-bold text-xs mb-2 block"
-                          for="fieldId"
-                        >
-                          Province/State *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
-                          bind:value={shipping.province}
-                        />
-                      </div>
-                      <div class="flex flex-col w-full">
-                        <label
-                          class="font-bold text-xs mb-2 block"
-                          for="fieldId"
-                        >
-                          Address *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
-                          bind:value={shipping.address}
-                        />
-                      </div>
-                    </div>
-                    <div class="flex space-x-3">
-                      <div class="flex flex-col w-full">
-                        <label
-                          class="font-bold text-xs mb-2 block"
-                          for="fieldId">City *</label
-                        >
-                        <input
-                          required
-                          type="text"
-                          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
-                          bind:value={shipping.city}
-                        />
-                      </div>
-                      <div class="flex flex-col w-full">
-                        <label
-                          class="font-bold text-xs mb-2 block"
-                          for="fieldId">ZIP/Postal code *</label
-                        >
-                        <input
-                          type="text"
-                          required
-                          class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
-                          bind:value={shipping.zip}
-                        />
-                      </div>
-                    </div>
-                    <button
-                      class="rounded flex font-bold space-x-2 border-blue-500 border-2 shadow text-xs text-center w-full py-2 px-4 text-blue-500 duration-200 justify-center items-center disabled:cursor-not-allowed disabled:opacity-75 hover:not-disabled:(bg-blue-500 text-white) "
-                      type="button"
-                      style="will-change: transform"
-                      disabled={detectingShipping}
-                      on:click={() => fillAddress('shipping')}
-                    >
-                      {detectingShipping
-                        ? 'Detecting...'
-                        : 'Detect address automatically'}
-                    </button>
-                  </div>
-                {/if}
-              </div>
-            {/if}
-          </div>
-          <div
-            class="border rounded rounded-lg flex flex-col w-full p-2 dark:divide-dark-600 dark:border-dark-400"
-          >
-            <div
-              class="flex space-x-2 w-full items-center"
-              on:click={() => changeStep('payment')}
-              class:cursor-pointer={step != 'payment' &&
-                completedSteps.billing &&
-                completedSteps.shipping}
-              title="Return to payment"
-              use:tooltip={{
-                show:
-                  step != 'payment' &&
-                  completedSteps.shipping &&
-                  completedSteps.billing,
-              }}
-            >
-              <div
-                class="border rounded-full flex font-bold font-title border-gray-300 h-8 text-xs text-white w-8 items-center justify-center dark:border-dark-400"
-                class:!border-transparent={completedSteps.payment ||
-                  step === 'payment'}
-                class:text-white={completedSteps.payment || step === 'payment'}
-                class:bg-dark-800={completedSteps.payment || step === 'payment'}
-              >
-                3
-              </div>
-              <div class="font-bold font-title text-xs">Payment</div>
-            </div>
-            {#if stripe && step === 'payment'}
-              <StripeContainer {stripe}>
-                <div
-                  class="border rounded rounded-lg flex flex-col space-y-2 mt-4 w-full p-2 dark:border-dark-400"
-                  in:scale|local={{
-                    duration: 600,
-                    start: 0.2,
-                    easing: expoOut,
-                    delay: 200,
-                  }}
-                  out:slide|local={{
-                    duration: 400,
-                    easing: expoOut,
-                  }}
-                  style="will-change: transform"
-                >
-                  <div class="flex flex-col w-full">
-                    <div class="flex mb-2 w-full items-center justify-between">
-                      <div class="font-bold text-xs block">
-                        Pay with a credit card
-                      </div>
-                    </div>
-                    {#if error}
-                      <div
-                        class="text-xs mb-2 text-red-500 block"
-                        transition:slide|local={{
-                          duration: 400,
-                          easing: expoOut,
-                        }}
-                      >
-                        {error.message}
-                      </div>
-                    {/if}
-                    <CardNumber
-                      bind:element={cardElement}
-                      classes={{ base: 'stripe-input' }}
-                      style={{ base: { color: dark ? 'white' : undefined } }}
-                    />
-                  </div>
-                  <div class="flex space-x-2">
-                    <CardExpiry
-                      classes={{ base: 'stripe-input' }}
-                      style={{ base: { color: dark ? 'white' : undefined } }}
-                    />
-                    <CardCvc
-                      classes={{ base: 'stripe-input' }}
-                      style={{ base: { color: dark ? 'white' : undefined } }}
-                    />
-                    <button
-                      class="rounded flex font-bold ml-auto space-x-2 bg-dark-800 shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end disabled:cursor-not-allowed hover:not-disabled:scale-105"
-                      style="will-change: transform"
-                    >
-                      Pay
-                    </button>
-                  </div>
-                </div>
-                <div class="flex w-full" class:mt-2={canUseAutoPayment}>
-                  <PaymentRequestButton
-                    bind:canMakePayment={canUseAutoPayment}
-                    paymentRequest={{
-                      country: 'US',
-                      currency: 'usd',
-                      total: {
-                        label: 'Total',
-                        amount: Math.trunc(total * 100),
-                      },
-                      requestPayerName: true,
-                      requestPayerEmail: true,
-                    }}
-                    classes={{ base: 'w-full' }}
-                    on:paymentmethod={pay}
+                  <input
+                    type="tel"
+                    placeholder="Ex. +1 XXXXXX"
+                    class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
+                    bind:value={billing.phone}
                   />
                 </div>
-                <div class="flex mt-2 w-full" bind:this={paypalButtonRef} />
-              </StripeContainer>
-            {/if}
-          </div>
-          {#if step !== 'payment'}
-            <button
-              class="rounded flex font-bold ml-auto space-x-2 bg-dark-800 shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end disabled:cursor-not-allowed hover:not-disabled:scale-105"
-              style="will-change: transform"
-            >
-              Next step
-            </button>
+              </div>
+              <div class="flex space-x-3">
+                <div class="flex flex-col w-full">
+                  <label class="font-bold text-xs mb-2 block" for="fieldId"
+                    >First name *</label
+                  >
+                  <input
+                    type="text"
+                    required
+                    class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
+                    bind:value={billing.firstName}
+                  />
+                </div>
+                <div class="flex flex-col w-full">
+                  <label class="font-bold text-xs mb-2 block" for="fieldId"
+                    >Last name</label
+                  >
+                  <input
+                    type="text"
+                    class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
+                    bind:value={billing.lastName}
+                  />
+                </div>
+              </div>
+              <div class="flex flex-col w-full">
+                <label class="font-bold text-xs mb-2 block" for="fieldId">
+                  Country/Region *
+                </label>
+                <select
+                  class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline"
+                  required
+                  bind:value={billing.country}
+                >
+                  <option value="" hidden />
+                  {#each countries as country}
+                    <option value={country.code}>{country.name}</option>
+                  {/each}
+                </select>
+              </div>
+              <div class="flex space-x-3">
+                <div class="flex flex-col w-full">
+                  <label class="font-bold text-xs mb-2 block" for="fieldId">
+                    Province/State *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
+                    bind:value={billing.province}
+                  />
+                </div>
+                <div class="flex flex-col w-full">
+                  <label class="font-bold text-xs mb-2 block" for="fieldId">
+                    Address *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
+                    bind:value={billing.address}
+                  />
+                </div>
+              </div>
+              <div class="flex space-x-3">
+                <div class="flex flex-col w-full">
+                  <label class="font-bold text-xs mb-2 block" for="fieldId"
+                    >City *</label
+                  >
+                  <input
+                    required
+                    type="text"
+                    class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
+                    bind:value={billing.city}
+                  />
+                </div>
+                <div class="flex flex-col w-full">
+                  <label class="font-bold text-xs mb-2 block" for="fieldId"
+                    >ZIP/Postal code *</label
+                  >
+                  <input
+                    type="text"
+                    required
+                    class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline "
+                    bind:value={billing.zip}
+                  />
+                </div>
+              </div>
+              <button
+                class="rounded flex font-bold space-x-2 border-blue-500 border-2 shadow text-xs text-center w-full py-2 px-4 text-blue-500 duration-200 justify-center items-center disabled:cursor-not-allowed disabled:opacity-75 hover:not-disabled:(bg-blue-500 text-white) "
+                type="button"
+                style="will-change: transform"
+                disabled={detectingShipping}
+                on:click={() => fillAddress('billing')}
+              >
+                {detectingShipping
+                  ? 'Detecting...'
+                  : 'Detect address automatically'}
+              </button>
+            </div>
           {/if}
+        </div>
+
+        <div
+          class="border rounded rounded-lg flex flex-col w-full p-2 dark:divide-dark-600 dark:border-dark-400"
+        >
+          <div
+            class="flex space-x-2 w-full items-center"
+            on:click={() => changeStep('payment')}
+            class:cursor-pointer={step != 'payment' && completedSteps.billing}
+            title="Return to payment"
+            use:tooltip={{
+              show: step != 'payment' && completedSteps.billing,
+            }}
+          >
+            <div
+              class="border rounded-full flex font-bold font-title border-gray-300 h-8 text-xs text-white w-8 items-center justify-center dark:border-dark-400"
+              class:!border-transparent={completedSteps.payment ||
+                step === 'payment'}
+              class:text-white={completedSteps.payment || step === 'payment'}
+              class:bg-dark-800={completedSteps.payment || step === 'payment'}
+              class:dark:text-dark-900={completedSteps.payment ||
+                step === 'payment'}
+              class:dark:bg-gray-100={completedSteps.payment ||
+                step === 'payment'}
+            >
+              2
+            </div>
+            <div class="font-bold font-title text-xs">Payment</div>
+          </div>
+          {#if stripe && step === 'payment'}
+            <StripeContainer {stripe}>
+              <div
+                class="border rounded rounded-lg flex flex-col space-y-2 mt-4 w-full p-2 dark:border-dark-400"
+                in:scale|local={{
+                  duration: 600,
+                  start: 0.2,
+                  easing: expoOut,
+                  delay: 200,
+                }}
+                out:slide|local={{
+                  duration: 400,
+                  easing: expoOut,
+                }}
+                style="will-change: transform"
+              >
+                <div class="flex flex-col w-full">
+                  <div class="flex mb-2 w-full items-center justify-between">
+                    <div class="font-bold text-xs block">
+                      Pay with a credit card
+                    </div>
+                  </div>
+                  {#if error}
+                    <div
+                      class="text-xs mb-2 text-red-500 block"
+                      transition:slide|local={{
+                        duration: 400,
+                        easing: expoOut,
+                      }}
+                    >
+                      {error.message}
+                    </div>
+                  {/if}
+                  <CardNumber
+                    bind:element={cardElement}
+                    classes={{ base: 'stripe-input' }}
+                    style={{ base: { color: dark ? 'white' : undefined } }}
+                  />
+                </div>
+                <div class="flex space-x-2">
+                  <CardExpiry
+                    classes={{ base: 'stripe-input' }}
+                    style={{ base: { color: dark ? 'white' : undefined } }}
+                  />
+                  <CardCvc
+                    classes={{ base: 'stripe-input' }}
+                    style={{ base: { color: dark ? 'white' : undefined } }}
+                  />
+                  <button
+                    class="rounded flex font-bold ml-auto space-x-2 bg-dark-800 shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end dark:(text-dark-900 bg-gray-100) disabled:cursor-not-allowed hover:not-disabled:scale-105 "
+                    style="will-change: transform"
+                  >
+                    Pay
+                  </button>
+                </div>
+              </div>
+              <div class="flex w-full" class:mt-2={canUseAutoPayment}>
+                <PaymentRequestButton
+                  bind:canMakePayment={canUseAutoPayment}
+                  paymentRequest={{
+                    country: 'US',
+                    currency: 'usd',
+                    total: {
+                      label: 'Total',
+                      amount: Math.trunc(total * 100),
+                    },
+                    requestPayerName: true,
+                    requestPayerEmail: true,
+                  }}
+                  classes={{ base: 'w-full' }}
+                  on:paymentmethod={pay}
+                />
+              </div>
+              <div class="flex mt-2 w-full" bind:this={paypalButtonRef} />
+            </StripeContainer>
+          {/if}
+        </div>
+        {#if step !== 'payment'}
+          <button
+            class="rounded-full flex font-bold ml-auto space-x-2 bg-dark-800 shadow text-white text-xs py-2 px-4 transform duration-200 items-center justify-self-end dark:(bg-gray-100 text-dark-900) disabled:cursor-not-allowed hover:not-disabled:scale-105 "
+            style="will-change: transform"
+          >
+            Next step
+          </button>
         {/if}
-      </div>
-    </form>
-  </div>
+      {/if}
+    </div>
+  </form>
 {/if}
 
 <style>

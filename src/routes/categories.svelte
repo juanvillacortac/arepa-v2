@@ -1,28 +1,41 @@
+<script context="module" lang="ts">
+  import type { Load } from '@sveltejs/kit'
+
+  const getCategories = (fetcher?: typeof fetch) =>
+    trpc(fetcher).query('products:categories:list')
+
+  export const load: Load = async ({ fetch }) => {
+    const categories = await getCategories(fetch)
+    return {
+      props: {
+        categories,
+      },
+    }
+  }
+</script>
+
 <script lang="ts">
   import { pageSubtitle } from '$lib'
   import { notifications } from '$lib/components/notifications'
-  import trpc, { invalidateQuery } from '$lib/trpc/client'
+  import trpc, { type InferQueryOutput } from '$lib/trpc/client'
   import type { StoreCategory } from '@prisma/client'
 
-  let categories = [] as (StoreCategory & {
-    _count: {
-      products: number
-    }
-  })[]
+  export let categories: InferQueryOutput<'products:categories:list'> = []
 
-  let selected: StoreCategory = {
-    id: '',
-    name: '',
-    slug: '',
-  }
+  let selected: StoreCategory | undefined = undefined
+  let name = ''
 
-  const saveCategory = async () => {
+  async function saveCategory() {
+    if (!name) return
     try {
-      // await trpc().mutation('stores:upsertCategory', {
-      //   ...selected,
-      // })
+      await trpc().mutation('products:categories:upsert', {
+        name,
+        id: selected?.id,
+        ordinal: selected?.ordinal,
+      })
+      categories = await getCategories()
       notifications.send(
-        'Category ' + (selected.id ? 'updated' : 'created'),
+        'Category ' + (selected?.id ? 'updated' : 'created'),
         'default',
         3000
       )
@@ -30,11 +43,15 @@
     } catch ({ message }) {
       notifications.send(message, 'default', 3000)
     }
-    selected = {
-      id: '',
-      name: '',
-      slug: '',
-    }
+    selected = undefined
+  }
+
+  function setName() {
+    name = selected?.name || ''
+  }
+
+  $: if (selected) {
+    setName()
   }
 
   $pageSubtitle = 'Categories'
@@ -49,11 +66,11 @@
       class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline"
       type="text"
       placeholder="Category name"
-      bind:value={selected.name}
+      bind:value={name}
     />
     <button
       class="rounded font-bold border-2 border-blue-500 text-xs py-2 px-4 text-blue-500 duration-200 disabled:cursor-not-allowed disabled:opacity-50 not-disabled:hover:bg-blue-500 not-disabled:hover:text-white"
-      disabled={!selected?.name}
+      disabled={!name}
       on:click={saveCategory}>{selected?.id ? 'Save' : 'Create'}</button
     >
   </div>
@@ -86,7 +103,7 @@
             <td class="py-4 px-6">{c._count.products} products</td>
             <td class="text-right py-4 px-6">
               <button
-                disabled={selected.id == c.id}
+                disabled={selected?.id == c.id}
                 on:click={() => (selected = c)}
                 class="font-medium text-blue-600 dark:text-blue-500 hover:underline disabled:opacity-70 disabled:pointer-not-allowed"
                 >Edit</button

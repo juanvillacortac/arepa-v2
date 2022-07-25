@@ -34,6 +34,7 @@
   import { expoOut } from 'svelte/easing'
   import { bag } from '$lib/stores'
   import { goto } from '$app/navigation'
+  import Image from '$lib/components/caravaggio/Image.svelte'
 
   const countries = getCountries()
 
@@ -341,7 +342,7 @@
           <div class="flex space-x-2 items-center">
             <div class="flex">
               <p
-                class="rounded bg-gray-100 text-xs p-1 whitespace-nowrap overflow-ellipsis uppercase dark:bg-dark-600"
+                class="rounded bg-gray-100 text-xs p-1 whitespace-nowrap overflow-ellipsis uppercase dark:bg-dark-100"
                 class:!bg-green-500={order.fulfillmentStatus === 'fulfilled'}
                 class:!text-white={order.fulfillmentStatus === 'fulfilled'}
               >
@@ -418,23 +419,20 @@
                   class="flex items-center sm:space-x-4 <lg:flex-col <lg:space-y-4"
                 >
                   <div
-                    class="rounded-lg bg-gray-100 w-full overflow-hidden pointer-events-none select-none sm:w-36  dark:bg-dark-900"
+                    class="rounded bg-gray-100 w-full overflow-hidden pointer-events-none select-none sm:w-36  dark:bg-dark-900"
                     style="aspect-ratio: 1/1"
                   >
                     <div class="flex h-full w-full items-center justify-center">
                       {#if p}
-                        <!-- <TemplatePreview
-                          lazy
-                          showFonts
-                          template={{
-                            ...(p?.template || {}),
-                            fields: getTemplateFieldsFromModifiers(
-                              p,
-                              item.modifiers
-                            ),
+                        <Image
+                          src={p?.meta.images[0].url || ''}
+                          options={{
+                            rs: {
+                              s: '480x480',
+                              m: 'scale',
+                            },
                           }}
-                          controls={false}
-                        /> -->
+                        />
                       {/if}
                     </div>
                   </div>
@@ -591,10 +589,7 @@
         </div>
       </div>
     {/if}
-    <div
-      class="w-full grid gap-4"
-      class:sm:grid-cols-2={order.billingData && order.shippingData}
-    >
+    <div class="w-full grid gap-4">
       {#if order.billingData}
         <div
           class="bg-white border rounded-lg flex flex-col space-y-4 border-gray-300 w-full p-4 top-0 relative overflow-hidden dark:bg-dark-800 dark:border-dark-400"
@@ -752,169 +747,6 @@
                 type="text"
                 bind:value={order.billingData.zip}
                 disabled={!editCustomer}
-                required
-              />
-            </div>
-          </div>
-        </div>
-      {/if}
-      {#if order.shippingData}
-        <div
-          class="bg-white border rounded-lg flex flex-col space-y-4 border-gray-300 w-full p-4 top-0 relative overflow-hidden dark:bg-dark-800 dark:border-dark-400"
-          id="shipping"
-        >
-          <div class="flex space-x-2 items-center justify-between">
-            <h4 class="font-bold font-title text-black dark:text-white">
-              Shipping details
-            </h4>
-            <div class="flex space-x-2 items-center items-end">
-              {#if editShipping}
-                <button
-                  class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
-                  title="Cancel"
-                  use:tooltip
-                  on:click={() => {
-                    order.shippingData = { ...shippingData }
-                    shippingData = null
-                    editShipping = false
-                  }}
-                >
-                  <Close16 />
-                </button>
-                <button
-                  class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
-                  title="Save"
-                  use:tooltip
-                  on:click={() => {
-                    updateShipping()
-                  }}
-                >
-                  <Checkmark16 />
-                </button>
-              {:else}
-                {#if order.shippingData?.coords}
-                  <a
-                    class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
-                    href={getMapsUrl(
-                      order.shippingData?.coords?.latitude,
-                      order.shippingData?.coords?.longitude
-                    )}
-                    target="__blank"
-                    title="View real shipping geolocation in a map"
-                    use:tooltip
-                  >
-                    <Map16 class="flex" />
-                  </a>
-                {/if}
-                <button
-                  class="border-transparent rounded flex border-2 p-1 duration-200 hover:border-gray-300"
-                  title="Edit shipping"
-                  use:tooltip
-                  on:click={() => {
-                    shippingData = { ...order.shippingData }
-                    editShipping = true
-                  }}
-                >
-                  <Pen16 />
-                </button>
-              {/if}
-            </div>
-          </div>
-          <div class="text-xs w-full grid gap-4 grid-cols-2">
-            <div class="flex flex-col space-y-1">
-              <p class="font-bold">Email:</p>
-              <input
-                class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline disabled:bg-gray-200 disabled:text-gray-500 disabled:dark:bg-dark-900"
-                type="email"
-                bind:value={order.shippingData.email}
-                disabled={!editShipping}
-                autocomplete="nope"
-                aria-autocomplete="none"
-                required
-              />
-            </div>
-            <div class="flex flex-col space-y-1">
-              <p class="font-bold">Phone number:</p>
-              <input
-                class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline disabled:bg-gray-200 disabled:text-gray-500 disabled:dark:bg-dark-900"
-                type="tel"
-                bind:value={order.shippingData.phone}
-                disabled={!editShipping}
-              />
-            </div>
-            <div class="flex flex-col space-y-1">
-              <p class="font-bold">First name:</p>
-              <input
-                class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline disabled:bg-gray-200 disabled:text-gray-500 disabled:dark:bg-dark-900"
-                type="text"
-                bind:value={order.shippingData.firstName}
-                autocomplete="nope"
-                disabled={!editShipping}
-                required
-              />
-            </div>
-            <div class="flex flex-col space-y-1">
-              <p class="font-bold">Last name:</p>
-              <input
-                class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline disabled:bg-gray-200 disabled:text-gray-500 disabled:dark:bg-dark-900"
-                type="text"
-                bind:value={order.shippingData.lastName}
-                autocomplete="nope"
-                disabled={!editShipping}
-              />
-            </div>
-            <div class="flex flex-col space-y-1">
-              <p class="font-bold">Country/Region:</p>
-              <select
-                class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline disabled:bg-gray-200 disabled:text-gray-500 disabled:dark:bg-dark-900"
-                bind:value={order.shippingData.country}
-                disabled={!editShipping}
-                autocomplete="nope"
-                required
-              >
-                {#each countries as c}
-                  <option value={c.code}>{c.name}</option>
-                {/each}
-              </select>
-            </div>
-            <div class="flex flex-col space-y-1">
-              <p class="font-bold">Province/State:</p>
-              <input
-                class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline disabled:bg-gray-200 disabled:text-gray-500 disabled:dark:bg-dark-900"
-                type="text"
-                bind:value={order.shippingData.province}
-                disabled={!editShipping}
-                required
-                autocomplete="nope"
-              />
-            </div>
-            <div class="flex flex-col space-y-1">
-              <p class="font-bold">Address:</p>
-              <input
-                class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline disabled:bg-gray-200 disabled:text-gray-500 disabled:dark:bg-dark-900"
-                type="text"
-                bind:value={order.shippingData.address}
-                disabled={!editShipping}
-                required
-              />
-            </div>
-            <div class="flex flex-col space-y-1">
-              <p class="font-bold">City:</p>
-              <input
-                class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline disabled:bg-gray-200 disabled:text-gray-500 disabled:dark:bg-dark-900"
-                type="text"
-                bind:value={order.shippingData.city}
-                disabled={!editShipping}
-                required
-              />
-            </div>
-            <div class="flex flex-col space-y-1">
-              <p class="font-bold">ZIP/Postal code:</p>
-              <input
-                class="bg-white border rounded border-gray-300 text-xs leading-tight w-full py-2 px-3 appearance-none dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline disabled:bg-gray-200 disabled:text-gray-500 disabled:dark:bg-dark-900"
-                type="text"
-                bind:value={order.shippingData.zip}
-                disabled={!editShipping}
                 required
               />
             </div>

@@ -1,4 +1,4 @@
-import type { RequestHandler } from '@sveltejs/kit'
+import type { RequestHandler } from './__types/fontface'
 
 export const GET: RequestHandler = ({ url }) => {
   const fontUrl = url.searchParams.get('src')

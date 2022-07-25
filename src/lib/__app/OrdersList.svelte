@@ -294,7 +294,7 @@
     </div>
   {:else}
     <div
-      class="bg-white border rounded-lg flex border-gray-300 w-full max-h-65vh relative overflow-auto dark:bg-dark-800 dark:border-dark-700"
+      class="bg-white border rounded-lg flex border-gray-300 w-full max-h-65vh relative overflow-auto dark:bg-dark-800 dark:border-dark-400"
     >
       {#if !orders}
         <div class="h-64vh w-full skeleton" />
@@ -310,7 +310,7 @@
               <div class="flex w-full items-center justify-between">
                 <div class="flex space-x-2 items-center">
                   <p
-                    class="rounded cursor-pointer font-normal bg-gray-100 text-xs p-1 transform text-gray-800 text-gray-80 whitespace-nowrap overflow-ellipsis overflow-hidden dark:bg-dark-600 dark:text-white hover:overflow-visible"
+                    class="rounded cursor-pointer font-normal bg-gray-100 text-xs p-1 transform text-gray-800 text-gray-80 whitespace-nowrap overflow-ellipsis overflow-hidden dark:bg-dark-100 dark:text-white hover:overflow-visible"
                     title="Copy to clipboard"
                     on:click={() => navigator.clipboard.writeText(o.id)}
                     use:tooltip
@@ -363,7 +363,7 @@
               <div class="flex w-full justify-between items-center">
                 <div class="flex space-x-2 items-center">
                   <p
-                    class="rounded bg-gray-100 text-xs p-1 whitespace-nowrap overflow-ellipsis uppercase dark:bg-dark-600"
+                    class="rounded bg-gray-100 text-xs p-1 whitespace-nowrap overflow-ellipsis uppercase dark:bg-dark-100"
                     class:!bg-green-500={o.fulfillmentStatus === 'fulfilled'}
                     class:!text-white={o.fulfillmentStatus === 'fulfilled'}
                   >
@@ -401,7 +401,7 @@
           class="text-sm text-left w-full text-gray-500 relative overflow-auto dark:text-gray-400"
         >
           <thead
-            class="bg-gray-50 text-xs top-0 text-gray-700 z-20 uppercase sticky dark:bg-dark-700 dark:text-gray-400"
+            class="bg-gray-50 text-xs top-0 text-gray-700 z-20 uppercase sticky dark:bg-dark-400 dark:text-gray-400"
           >
             <tr>
               <th scope="col" class="py-3 px-6"> Order Id </th>
@@ -432,7 +432,7 @@
                 >
                   <div class="flex w-12ch">
                     <p
-                      class="rounded cursor-pointer font-normal bg-gray-100 text-xs p-1 transform whitespace-nowrap overflow-ellipsis overflow-hidden dark:bg-dark-600 hover:overflow-visible "
+                      class="rounded cursor-pointer font-normal bg-gray-100 text-xs p-1 transform whitespace-nowrap overflow-ellipsis overflow-hidden dark:bg-dark-100 hover:overflow-visible "
                       title="Copy to clipboard"
                       on:click={() => navigator.clipboard.writeText(o.id)}
                       use:tooltip
@@ -456,7 +456,7 @@
                 <td class="py-4 px-6">
                   <div class="flex">
                     <p
-                      class="rounded bg-gray-100 text-xs p-1 whitespace-nowrap overflow-ellipsis uppercase dark:bg-dark-600"
+                      class="rounded bg-gray-100 text-xs p-1 whitespace-nowrap overflow-ellipsis uppercase dark:bg-dark-100"
                       class:!bg-green-500={o.fulfillmentStatus === 'fulfilled'}
                       class:!text-white={o.fulfillmentStatus === 'fulfilled'}
                     >

@@ -137,7 +137,7 @@ ${
           to: recipient,
           from: {
             name: 'Arepa Venezuelan Kitchen',
-            email: `contact@shackcart.com`,
+            email: `orders@arepavenezuelakitchen.com`,
           },
           headers: {
             Priority: 'Urgent',
@@ -188,7 +188,7 @@ ${
         to: recipient,
         from: {
           name: 'Arepa Venezuelan Kitchen',
-          email: `contact@shackcart.com`,
+          email: `orders@arepavenezuelakitchen.com`,
         },
         headers: {
           Priority: 'Urgent',

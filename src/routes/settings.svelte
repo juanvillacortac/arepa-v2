@@ -7,7 +7,6 @@
   import { useCaravaggioBuilder } from '$lib/components/caravaggio/useCaravaggio'
   import StripeLogo from '$lib/components/__StripeLogo.svelte'
   import PaypalLogo from '$lib/components/__PaypalLogo.svelte'
-  import trpc from '$lib/trpc/client'
   import { Editor } from 'bytemd'
 
   const contactEmailTemplate = redisWritable(

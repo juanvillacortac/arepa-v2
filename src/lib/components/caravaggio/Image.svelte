@@ -1,16 +1,18 @@
 <script lang="ts">
   import type { CaravaggioOptions } from './urlBuilder'
-  import { useCaravaggio } from './useCaravaggio'
+  import { useCaravaggioBuilder } from './useCaravaggio'
 
   export let src: string
   export let href = ''
   export let options: CaravaggioOptions
   export let showOriginal: string = ''
 
+  const imageBuilder = useCaravaggioBuilder()
+
   $: url =
     src?.endsWith(showOriginal) && showOriginal
       ? src
-      : useCaravaggio(src, options)
+      : imageBuilder(src, options)
 </script>
 
 {#if href}

@@ -6,7 +6,7 @@ export const GET: RequestHandler = async (event) => {
   const imageBuilder = useCaravaggioBuilder(
     event.url.protocol + '//' + event.url.host
   )
-  const icon = '/images/logo.svg'
+  const icon = '/images/logo.webp'
   const iconsRes = [36, 48, 72, 96, 144, 192, 256, 384, 512]
   const getIcon = (res: number) =>
     imageBuilder(icon, {

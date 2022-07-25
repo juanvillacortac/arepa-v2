@@ -74,7 +74,7 @@
   import { preferences } from '$lib'
   import { browser } from '$app/env'
   import Toast from '$lib/components/Toast.svelte'
-  import { onDestroy, SvelteComponentTyped } from 'svelte'
+  import { onDestroy } from 'svelte'
 
   $: if (browser)
     document.documentElement.classList.toggle('dark', $preferences.darkMode)

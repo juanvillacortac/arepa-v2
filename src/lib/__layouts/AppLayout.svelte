@@ -261,10 +261,10 @@
                 class="flex mr-4"
                 title="Go back"
                 use:tooltip
-                href={$page.url.pathname.substring(
+                href={!$page.url.pathname.substring(
                   0,
                   $page.url.pathname.lastIndexOf('/')
-                ) === $page.url.pathname
+                )
                   ? '/'
                   : $page.url.pathname.substring(
                       0,

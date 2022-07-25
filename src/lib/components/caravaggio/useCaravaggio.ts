@@ -48,7 +48,7 @@ export const useCaravaggioIfAvailable = (
   opt?: CaravaggioOptions
 ): string | null | undefined => {
   const context = useCaravaggioContext()
-  context.baseUrl = get(session)?.host
+  context.baseUrl = get(session)?.fullHost
   if (!context || !imageUrl) {
     return imageUrl
   }

@@ -20,10 +20,7 @@ export const GET: RequestHandler = async (event) => {
       },
     })
 
-  const title =
-    layout === 'app'
-      ? 'Arepa Venezuelan Kitchen Admin'
-      : 'Arepa Venezuelan Kitchen Admin'
+  const title = layout === 'app' ? 'AVK Admin' : 'Arepa Venezuelan Kitchen'
 
   return {
     headers: {

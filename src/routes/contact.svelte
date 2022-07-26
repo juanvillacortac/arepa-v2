@@ -19,12 +19,12 @@
 
   const submit = () => {
     dialog = true
-    // trpc().mutation('utils:marketing:sendContactEmail', {
-    //   email,
-    //   message,
-    //   phone,
-    //   name: `${firstName} ${lastName}`,
-    // })
+    trpc().mutation('utils:marketing:sendContactEmail', {
+      email,
+      message,
+      phone,
+      name: `${firstName} ${lastName}`,
+    })
   }
 </script>
 

@@ -235,9 +235,9 @@
         bind:value={category}
       >
         <option value="">All categories</option>
-        <!-- {#each store.categories || [] as category}
-              <option value={category.slug}>{category.name}</option>
-            {/each} -->
+        {#each $page.stuff.categories || [] as category}
+          <option value={category.slug}>{category.name}</option>
+        {/each}
       </select>
       <button
         class="rounded-tr rounded-br flex bg-dark-800 text-white  p-2 items-center dark:bg-dark-400"

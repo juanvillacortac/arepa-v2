@@ -165,7 +165,7 @@
         options={{
           o: 'png',
           rs: {
-            s: '128',
+            s: '238x',
             m: 'scale',
           },
         }}

@@ -36,8 +36,6 @@
   import { tooltip } from '$lib/components/tooltip'
   import { setContext } from 'svelte'
   import { writable, type Writable } from 'svelte/store'
-  import { dev } from '$app/env'
-  import { scaleLinear } from 'd3-scale'
 
   export let data: any | undefined = undefined
   export let editable = false
@@ -59,134 +57,7 @@
   }
 
   const media = watchMedia(mediaqueries)
-
-  let xDeg = 0
-  let yDeg = 0
-  let windowWidth = 0
-  let windowHeight = 0
-
-  $: xScale = scaleLinear().domain([0, windowWidth]).range([-10, 10])
-  $: yScale = scaleLinear().domain([0, windowHeight]).range([-10, 10])
-
-  function handleMousemove(event) {
-    xDeg = xScale(event.clientX)
-    yDeg = yScale(event.clientY)
-  }
 </script>
-
-<svelte:window
-  bind:innerWidth={windowWidth}
-  bind:innerHeight={windowHeight}
-  on:mousemove={handleMousemove}
-/>
-
-<Viewport
-  class="bg-cover bg-center flex bg-opacity-5 w-full min-h-[calc(100vh-var(--nh))] p-4 justify-center items-center relative"
-  --a-d="100ms"
-  --a-y="0.5rem"
->
-  <div
-    class="bg-cover bg-center flex h-full w-full opacity-50 absolute filter grayscale"
-    style="background-image: url('https://media-cdn.tripadvisor.com/media/photo-s/09/1d/24/6c/arepa-venezuelan-kitchen.jpg')"
-  />
-  <div
-    class="bg-gradient-to-b from-transparent to-white flex h-[70%] w-full bottom-0 left-0 absolute dark:to-dark-800"
-  />
-  <div class="flex relative">
-    <div
-      class="flex h-full w-full transform  inset-0 absolute justify-center items-center sm:(translate-y-$my translate-x-$mx) <lg:scale-70 "
-      style="transition: 1000ms cubic-bezier(.3, 1, 1, .3); --mx: {xDeg}px; --my: {yDeg}px"
-    >
-      <div class="absolute anim" style:--anim-d="500ms">
-        <div
-          class="m-auto rounded-2xl h-68 transform shadow-2xl w-48 rotate-16 translate-x-20 translate-y-5 relative overflow-hidden"
-        >
-          <div
-            class="bg-gradient-to-br flex  h-full from-red-300 to-red-500 w-full opacity-80 absolute dark:(from-red-500 to-red-700) "
-          />
-          <img
-            src="https://images.unsplash.com/photo-1619684269684-6a3f2ffa8971?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=876&q=80"
-            alt=""
-            class="flex h-full object-cover w-full"
-          />
-        </div>
-      </div>
-      <div class="absolute anim">
-        <div
-          class="m-auto rounded-2xl h-68 transform shadow-2xl w-48 -rotate-12 -translate-x-20 translate-y-5 relative overflow-hidden"
-        >
-          <div
-            class="bg-gradient-to-br flex h-full from-yellow-300 to-yellow-500 w-full opacity-80 absolute dark:(from-yellow-500 to-yellow-700) "
-          />
-          <img
-            src="https://images.unsplash.com/photo-1619684269835-152b5bcdad79?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=385&q=80"
-            alt=""
-            class="flex h-full object-cover w-full"
-          />
-        </div>
-      </div>
-      <div class="absolute anim" style:--anim-d="300ms">
-        <div
-          class="m-auto rounded-2xl h-72 transform shadow-2xl w-52 -translate-y-5 relative overflow-hidden"
-        >
-          <div
-            class="bg-gradient-to-br flex h-full from-blue-300 to-blue-500 w-full opacity-80 absolute dark:(from-blue-500 to-blue-700) "
-          />
-          <Image
-            src="https://images.unsplash.com/photo-1587603366933-aa6947174c65?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=389&q=80"
-            showOriginal={dev ? 'png' : undefined}
-            class="flex h-full object-cover w-full"
-            --anim-d="700ms"
-            options={{
-              o: 'png',
-              rs: {
-                s: '208x288',
-                m: 'scale',
-              },
-            }}
-          />
-          <!-- <img
-          src="https://images.unsplash.com/photo-1587603366933-aa6947174c65?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=389&q=80"
-          alt=""
-        /> -->
-        </div>
-      </div>
-    </div>
-    <div
-      class="transform sm:(translate-y-$my translate-x-$mx) "
-      style="transition: 1000ms cubic-bezier(.3, 1, 1, .3); --mx: {xDeg *
-        2}px; --my: {yDeg * 2}px"
-    >
-      <Image
-        src="/images/logo.png"
-        showOriginal={dev ? 'png' : undefined}
-        class="rounded-sm p-px h-30 w-auto relative anim lg:h-50 dark:(filter invert) "
-        --anim-d="700ms"
-        options={{
-          o: 'png',
-          rs: {
-            s: '128',
-            m: 'scale',
-          },
-        }}
-      />
-    </div>
-  </div>
-  <!-- <img
-    src="/images/logo.webp"
-    alt=""
-    class="relative anim"
-    style:--anim-d="700ms"
-  /> -->
-  <!-- <h1
-    class="font-bold font-handwritten text-center p-2 text-4xl text-dark-900 relative anim xl:text-6xl dark:text-white"
-    style:--anim-d="700ms"
-  >
-    Arepa
-    <br />
-    Venezuelan Kitchen
-  </h1> -->
-</Viewport>
 
 <Viewport>
   <div
@@ -647,14 +518,3 @@
     </Viewport>
   </div>
 </div>
-
-<style>
-  :global(*) {
-    --nh: 114px;
-  }
-  @screen lg {
-    :global(*) {
-      --nh: 81px;
-    }
-  }
-</style>

@@ -358,8 +358,6 @@
     dispatch('checkout', event)
   }
 
-  $: console.log(order)
-
   async function pay(e) {
     waiting = true
     const paymentMethod = e.detail.paymentMethod

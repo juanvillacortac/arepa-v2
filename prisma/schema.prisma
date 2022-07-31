@@ -157,6 +157,7 @@ model Order {
 
   status            OrderStatus       @default(pending)
   fulfillmentStatus FulfillmentStatus @default(unfulfilled)
+  tip               Float             @default(0)
   total             Float             @default(0)
 
   billingData  Json?

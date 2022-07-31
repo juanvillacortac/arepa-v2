@@ -72,11 +72,13 @@
           <Image
             src="/images/logo.webp"
             showOriginal={dev ? 'webp' : undefined}
-            class="rounded-sm p-px h-2rem lg:h-3rem dark:(filter invert) "
+            class="rounded-sm p-px h-2rem w-auto lg:h-3rem dark:(filter invert) "
+            width="78"
+            height="48"
             options={{
               o: 'png',
               rs: {
-                s: 'x48',
+                s: '78x48',
                 m: 'scale',
               },
             }}

@@ -47,7 +47,6 @@
   let mounted = false
   onMount(() => {
     mounted = true
-    console.log(order?.billingData)
   })
   let products: Record<string, Product>
   $: if (mounted && order.items) {

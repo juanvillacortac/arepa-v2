@@ -144,7 +144,6 @@ export function redisWritable<T>(
     const k = key || get(keyStore)
     if (k) {
       redis.get(k).then((d) => {
-        console.log(d)
         if (!d) return
         store.set(sj.parse(JSON.stringify(d as string)))
       })

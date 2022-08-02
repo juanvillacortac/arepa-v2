@@ -535,7 +535,7 @@
   <div class="flex w-full py-16">
     <Viewport
       oneWay
-      class="flex-col flex w-full items-center lg:flex-row-reverse <lg:space-y-8"
+      class="flex-col flex w-full items-center lg:flex-row-reverse lg:space-x-8 <lg:space-y-8"
       --a-y="1rem"
     >
       <div class="flex flex-col space-y-6 w-full items-center justify-center">

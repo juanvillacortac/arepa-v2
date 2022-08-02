@@ -14,6 +14,7 @@
     Logout16,
     Settings16,
     OrderDetails16,
+    LogoFacebook24,
   } from 'carbon-icons-svelte'
   import { tooltip } from '$lib/components/tooltip'
   import { bag, customer, pageSubtitle, preferences } from '$lib/stores'
@@ -61,7 +62,7 @@
   class="flex flex-col min-h-screen top-0 left-0 text-gray-700 relative dark:text-white"
 >
   <div
-    class="bg-white border-b flex flex-col w-full top-0 z-80 items-center sticky filter blur-lg !bg-opacity-90 dark:bg-dark-800 dark:border-dark-400"
+    class="bg-white border-b flex flex-col w-full top-0 z-80 items-center sticky filter blur-lg !bg-opacity-80 dark:bg-dark-800 dark:border-dark-400"
   >
     <div class="flex mx-auto w-full p-4 justify-between items-center lg:w-9/10">
       <div class="flex space-x-4 items-center">
@@ -252,6 +253,38 @@
   <div class="flex-grow">
     <slot />
   </div>
+  <div class="mx-auto w-full grid p-4 py-6 lg:w-9/10 lg:grid-cols-3">
+    <div class="flex flex-col w-full">
+      <Image
+        src="/images/logo-alt.webp"
+        showOriginal={dev ? 'webp' : undefined}
+        class="dark:(filter invert) "
+        width="128"
+        height="128"
+        options={{
+          o: 'png',
+          rs: {
+            s: '128x128',
+            m: 'scale',
+          },
+        }}
+      />
+    </div>
+    <div class="flex flex-col space-y-6 text-xs">
+      <div class="flex flex-col space-y-2">
+        <div class="font-title font-bold text-xl text-dark-900 dark:text-white">
+          Direction
+        </div>
+        <p>1405 NE 50th St, Seattle, WA 98105, United States</p>
+      </div>
+      <div class="flex flex-col space-y-2">
+        <div class="font-title font-bold text-xl text-dark-900 dark:text-white">
+          Phone
+        </div>
+        <a href="tel:+12065564879" class="hover:underline">+1 206-556-4879</a>
+      </div>
+    </div>
+  </div>
   <div class="bg-dark-900 w-full !text-white">
     <div
       class="flex mx-auto text-xs w-full p-4 justify-between items-center <sm:flex-col <sm:space-y-4 <sm:items-center lg:w-9/10"
@@ -262,14 +295,14 @@
       </p>
       <div class="flex space-x-4 items-center">
         <a
-          href="https://twitter.com/decalshutca"
+          href="https://www.facebook.com/ArepaVen/"
           target="__blank"
           class="duration-200 !hover:text-gray-400"
         >
-          <LogoTwitter24 />
+          <LogoFacebook24 />
         </a>
         <a
-          href="https://www.instagram.com/decalshutca"
+          href="https://www.instagram.com/arepa.vk"
           target="__blank"
           class="duration-200 !hover:text-gray-400"
         >

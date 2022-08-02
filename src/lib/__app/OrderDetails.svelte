@@ -136,7 +136,8 @@
     }
   }
 
-  $: total = products ? getTotal(order) : 0
+  $: subTotal = products ? getTotal(order) : 0
+  $: total = subTotal + order.tip
 
   $: feeStr = (fee: OrderFee) => {
     const total = products ? getTotal(order) : 0
@@ -831,7 +832,7 @@
               <div class="flex justify-between">
                 <div>Subtotal ({order.items?.length || 0} items):</div>
                 <p>
-                  ${total.toLocaleString('en', {
+                  ${subTotal.toLocaleString('en', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
@@ -840,9 +841,9 @@
             </div>
             <div class="flex flex-col font-bold space-y-4 text-xs p-2">
               <div class="flex justify-between">
-                <div>Shipping:</div>
+                <div>Tip:</div>
                 <p>
-                  ${(0).toLocaleString('en', {
+                  ${order.tip.toLocaleString('en', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}

@@ -1,6 +1,12 @@
 <script lang="ts">
   import { page } from '$app/stores'
-  import { bag, currentOrder, preferences, type BagItem } from '$lib'
+  import {
+    bag,
+    currentOrder,
+    pageSubtitle,
+    preferences,
+    type BagItem,
+  } from '$lib'
   import { tooltip } from '$lib/components/tooltip'
   import type { Order, Product } from '$lib/db'
   import {
@@ -162,6 +168,10 @@
     bag.setItem(product, modifiers, newModifiers)
     $disableTransition = false
   }
+  let customTip = false
+  let tip = 0.15
+
+  $pageSubtitle = 'Bag'
 </script>
 
 <svelte:head>
@@ -176,6 +186,7 @@
   on:checkout={() => bag.clear()}
   bind:order={$currentOrder}
   bind:open={checkout}
+  tip={!customTip ? total * tip : tip}
   dark={$preferences.darkMode}
   items={$bag}
   {products}
@@ -396,15 +407,112 @@
             {/key}
           </div>
         </div>
-        <div class="flex space-x-4 w-full justify-end items-center">
-          {#if loaded}
-            <p class="font-bold text-lg">
-              Total: ${total.toLocaleString('en', {
-                maximumFractionDigits: 2,
-                minimumFractionDigits: 2,
-              })}
-            </p>
+        {#if loaded}
+          <p class="font-bold text-lg text-right">
+            Total: ${total.toLocaleString('en', {
+              maximumFractionDigits: 2,
+              minimumFractionDigits: 2,
+            })}
+          </p>
+        {/if}
+        <div class="flex flex-col font-title space-y-2 w-full lg:items-end">
+          <div class="font-bold text-lg">
+            Do you want to support us with a tip?
+          </div>
+          <div class="grid gap-2 grid-cols-4">
+            <button
+              type="button"
+              on:click={() => {
+                tip = 0.15
+                customTip = false
+              }}
+              class="border rounded flex flex-col border-gray-300 p-2 items-center justify-center lg:rounded-lg dark:border-gray-600"
+              class:!border-blue-500={tip === 0.15 && !customTip}
+              class:!shadow-lg={tip === 0.15 && !customTip}
+            >
+              <div class="font-bold text-lg">15%</div>
+              <div class="font-bold text-xs">
+                ${(total * 0.15).toLocaleString('en', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </div>
+            </button>
+            <button
+              type="button"
+              on:click={() => {
+                tip = 0.1
+                customTip = false
+              }}
+              class="border rounded flex flex-col border-gray-300 p-2 justify-center items-center lg:rounded-lg dark:border-gray-600"
+              class:!border-blue-500={tip === 0.1 && !customTip}
+              class:!shadow-lg={tip === 0.1 && !customTip}
+            >
+              <div class="font-bold text-lg">10%</div>
+              <div class="font-bold text-xs">
+                ${(total * 0.1).toLocaleString('en', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </div>
+            </button>
+            <button
+              type="button"
+              on:click={() => {
+                tip = 0.05
+                customTip = false
+              }}
+              class="border rounded flex flex-col border-gray-300 p-2 justify-center items-center lg:rounded-lg dark:border-gray-600"
+              class:!border-blue-500={tip === 0.05 && !customTip}
+              class:!shadow-lg={tip === 0.05 && !customTip}
+            >
+              <div class="font-bold text-lg">5%</div>
+              <div class="font-bold text-xs">
+                ${(total * 0.05).toLocaleString('en', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </div>
+            </button>
+            <button
+              type="button"
+              on:click={() => {
+                tip = 10
+                customTip = true
+              }}
+              class:!border-blue-500={customTip}
+              class:!shadow-lg={customTip}
+              class="border rounded flex flex-col border-gray-300 p-2 justify-center items-center lg:rounded-lg dark:border-gray-600"
+            >
+              <div class="font-bold text-xs">Custom</div>
+            </button>
+          </div>
+          {#if customTip}
+            <div
+              class="flex flex-col space-y-2 items-end"
+              transition:slide={{ duration: 400, easing: expoOut }}
+            >
+              <div class="font-bold !text-xs">Enter a quantity</div>
+              <div class="flex !text-xs">
+                <div
+                  class="border rounded-l flex bg-light-600 border-gray-300 p-1 items-center dark:bg-dark-700  dark:border-dark-400"
+                >
+                  $
+                </div>
+                <input
+                  class="bg-white border-t border-r border-b rounded-r border-gray-300 border-l-0 border-r-0 text-xs text-center leading-tight py-1 px-2 w-8ch quantity dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline focus:z-10"
+                  type="number"
+                  bind:value={tip}
+                  on:input={() => {
+                    tip = Math.abs(tip)
+                  }}
+                  min="0"
+                />
+              </div>
+            </div>
           {/if}
+        </div>
+        <div class="flex space-x-4 w-full justify-end items-center">
           <button
             class="rounded-full flex font-bold space-x-2 bg-dark-800 shadow text-white text-xs p-2 transform duration-200 items-center dark:(bg-gray-100 text-dark-900) disabled:(cursor-not-allowed opacity-50) hover:not-disabled:scale-105 "
             style="will-change: transform"

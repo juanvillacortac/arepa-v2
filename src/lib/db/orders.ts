@@ -155,10 +155,13 @@ export const createOrder = async ({
   prisma.order.create({
     data: {
       id: nanoid(8),
+      tip: order.tip,
       customerId: order.customerId,
       billingData: order.billingData,
       paymentMethods: order.paymentMethods || [],
-      total: order.items.map((i) => i.cost || 0).reduce((a, b) => a + b, 0),
+      total:
+        order.items.map((i) => i.cost || 0).reduce((a, b) => a + b, 0) +
+        order.tip,
       fees: {
         createMany: {
           data: order.fees.map((f) => ({
@@ -273,6 +276,7 @@ export const updateOrder = async (
       paymentMethods: order.paymentMethods,
       status: order.status,
       token: order.token,
+      tip: order.tip,
       billingData: order.billingData
         ? {
             ...((original?.billingData as any) || {}),
@@ -286,7 +290,8 @@ export const updateOrder = async (
           }
         : undefined,
       total: order.items
-        ? order.items.map((i) => i.cost || 0).reduce((a, b) => a + b, 0)
+        ? order.items.map((i) => i.cost || 0).reduce((a, b) => a + b, 0) +
+          (order.tip || 0)
         : undefined,
       fees: order.fees
         ? {

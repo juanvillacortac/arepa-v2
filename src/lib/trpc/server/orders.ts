@@ -26,6 +26,7 @@ const mutations = trpc
         status: orderStatus,
         customerId: z.string().optional(),
         billingData: z.any(),
+        tip: z.number().min(0).optional().default(0),
         items: z.array(
           z.object({
             productId: z.string(),
@@ -76,6 +77,7 @@ const mutations = trpc
       billingData: z.any().optional(),
       shippingData: z.any().optional(),
       fulfillmentStatus: fulfillmentStatus.optional(),
+      tip: z.number().min(0).optional().default(0),
       items: z
         .array(
           z.object({

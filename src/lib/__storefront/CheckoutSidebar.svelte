@@ -38,7 +38,7 @@
   import type { BagItem } from '$lib'
   import { getTotalFromProductModifiers } from '$lib/utils/modifiers'
   import { page } from '$app/stores'
-  import { customer, redisWritable } from '$lib/stores'
+  import { customer, pageSubtitle, redisWritable } from '$lib/stores'
   import { portal } from 'svelte-portal'
 
   const countries = getCountries()
@@ -77,6 +77,12 @@
     billing = order.billingData
     mergeAddress = true
     step = completedSteps.billing ? 'payment' : 'billing'
+    tick().then(() => {
+      if (step === 'payment') {
+        paypalButtonComponent = createPaypalButton(total)
+        paypalButtonComponent?.render(paypalButtonRef as HTMLElement)
+      }
+    })
   }
 
   $: if (open) {
@@ -88,6 +94,7 @@
   export let products: Record<string, Product>
   export let items: BagItem[]
   export let order: Order | null = null
+  export let tip = 0
   let placedOrder: Order | undefined
 
   let billing: Record<string, any> = {}
@@ -229,6 +236,7 @@
       id: order!.id,
       billingData,
       shippingData,
+      tip,
       items: items.map((i, idx) => ({
         productId: products[i.productSlug].id,
         quantity: i.quantity,
@@ -256,6 +264,7 @@
             paymentMethods: [],
             fees: [],
             billingData: billing,
+            tip,
             items: items.map((i) => ({
               productId: products[i.productSlug].id,
               quantity: i.quantity,
@@ -329,6 +338,7 @@
         id: order?.id,
         paymentMethods: [event.method],
         status: 'paid',
+        tip,
         items: items.map((i, idx) => ({
           productId: products[i.productSlug].id,
           quantity: i.quantity,
@@ -581,9 +591,20 @@
           </div>
           <div class="flex flex-col font-bold space-y-4 text-xs p-2">
             <div class="flex justify-between">
+              <div>Tip:</div>
+              <p>
+                ${tip.toLocaleString('en', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </p>
+            </div>
+          </div>
+          <div class="flex flex-col font-bold space-y-4 text-xs p-2">
+            <div class="flex justify-between">
               <div>Total:</div>
               <p>
-                ${total.toLocaleString('en', {
+                ${(total + tip).toLocaleString('en', {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })}

@@ -172,20 +172,6 @@
       />
     </div>
   </div>
-  <!-- <img
-    src="/images/logo.webp"
-    alt=""
-    class="relative anim"
-    style:--anim-d="700ms"
-  /> -->
-  <!-- <h1
-    class="font-bold font-handwritten text-center p-2 text-4xl text-dark-900 relative anim xl:text-6xl dark:text-white"
-    style:--anim-d="700ms"
-  >
-    Arepa
-    <br />
-    Venezuelan Kitchen
-  </h1> -->
 </Viewport>
 
 <Viewport>
@@ -473,14 +459,13 @@
         >
       </h3>
     </Viewport>
-    <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="w-full grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
       {#each products as p (p.id)}
         <div
           class="bg-white border rounded-lg cursor-pointer flex flex-col space-y-2 border-gray-300 p-2 transform transition-all relative dark:bg-dark-800 dark:border-dark-400 hover:shadow-lg hover:scale-102"
           style="will-change: transform"
           on:click={() => goto(`/menu/${p.slug}`)}
         >
-          <!-- {#if p.template} -->
           <div class="flex h-full w-full aspect-square">
             <Image
               src={p?.meta.images[0].url || ''}
@@ -495,7 +480,6 @@
               }}
             />
           </div>
-          <!-- {/if} -->
           <div class="flex flex-col flex-grow h-full space-y-1 justify-between">
             <div class="flex flex-col space-y-1">
               <a
@@ -545,11 +529,13 @@
   </div>
 {/if}
 
-<div class="flex-col flex mx-auto w-full p-4 py-16 items-center lg:w-9/10">
+<div
+  class="flex-col flex mx-auto w-full p-4 py-16 items-center overflow-hidden lg:w-9/10"
+>
   <div class="flex w-full py-16">
     <Viewport
       oneWay
-      class="flex-col flex w-full items-center lg:flex-row-reverse <lg:mb-16"
+      class="flex-col flex w-full items-center lg:flex-row-reverse <lg:space-y-8"
       --a-y="1rem"
     >
       <div class="flex flex-col space-y-6 w-full items-center justify-center">
@@ -609,11 +595,9 @@
         class="flex w-full justify-center relative items-center anim"
         style:--anim-d="400ms"
       >
-        <div
-          class="h-full h-60 w-60 -z-10 absolute aspect-square lg:h-auto lg:h-80 lg:w-80"
-        >
+        <div class="h-full h-auto w-full -z-10 absolute aspect-square">
           <div
-            class="h-full w-full transform translate-x-5 translate-y-5 polka"
+            class="rounded-lg h-full w-full transform translate-x-5 translate-y-5 polka"
           />
         </div>
 
@@ -626,9 +610,18 @@
           let:image
         >
           <div
-            class="flex bg-blue-300 bg-opacity-50 aspect-square items-center justify-center relative overflow-hidden lg:h-80 lg:w-80"
+            class="rounded flex h-full bg-blue-300 bg-opacity-50 w-full aspect-square items-center justify-center relative overflow-hidden"
           >
-            <Image
+            <iframe
+              title="Location"
+              src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d10748.051701860451!2d-122.3127703!3d47.6647453!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x36f42ccb107444f6!2sArepa%20Restaurante%20venezolano!5e0!3m2!1ses-419!2sve!4v1659414237411!5m2!1ses-419!2sve"
+              class="rounded flex h-full w-full aspect-square"
+              style="border:0;"
+              allowfullscreen
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+            />
+            <!-- <Image
               src={image || ''}
               options={{
                 rs: {
@@ -640,7 +633,7 @@
               class="flex h-auto w-full aspect-square"
               width={248}
               height={248}
-            />
+            /> -->
           </div>
         </ElementEditor>
       </div>

@@ -253,7 +253,7 @@
   <div class="flex-grow">
     <slot />
   </div>
-  <div class="mx-auto w-full grid p-4 py-6 lg:w-9/10 lg:grid-cols-3">
+  <div class="mx-auto w-full grid p-4 py-6 gap-6 lg:w-9/10 lg:grid-cols-3">
     <div class="flex flex-col w-full">
       <Image
         src="/images/logo-alt.webp"

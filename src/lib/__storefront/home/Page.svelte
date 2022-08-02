@@ -532,7 +532,7 @@
 <div
   class="flex-col flex mx-auto w-full p-4 py-16 items-center overflow-hidden lg:w-9/10"
 >
-  <div class="flex w-full py-16">
+  <div class="flex w-full py-16 lg:px-8">
     <Viewport
       oneWay
       class="flex-col flex w-full items-center lg:flex-row-reverse lg:space-x-16 <lg:space-y-8"
@@ -600,42 +600,19 @@
             class="rounded-lg h-full w-full transform translate-x-5 translate-y-5 polka"
           />
         </div>
-
-        <ElementEditor
-          root={nodes}
-          keys={{
-            image: `about.image`,
-          }}
-          innerButtons
-          let:image
+        <div
+          class="rounded flex h-full bg-blue-300 bg-opacity-50 w-full aspect-square items-center justify-center relative overflow-hidden"
         >
-          <div
-            class="rounded flex h-full bg-blue-300 bg-opacity-50 w-full aspect-square items-center justify-center relative overflow-hidden"
-          >
-            <iframe
-              title="Location"
-              src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d10748.051701860451!2d-122.3127703!3d47.6647453!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x36f42ccb107444f6!2sArepa%20Restaurante%20venezolano!5e0!3m2!1ses-419!2sve!4v1659414237411!5m2!1ses-419!2sve"
-              class="rounded flex h-full w-full aspect-square"
-              style="border:0;"
-              allowfullscreen
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
-            />
-            <!-- <Image
-              src={image || ''}
-              options={{
-                rs: {
-                  s: '248x248',
-                  m: 'scale',
-                  b: '000000.0',
-                },
-              }}
-              class="flex h-auto w-full aspect-square"
-              width={248}
-              height={248}
-            /> -->
-          </div>
-        </ElementEditor>
+          <iframe
+            title="Location"
+            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d10748.051701860451!2d-122.3127703!3d47.6647453!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x36f42ccb107444f6!2sArepa%20Restaurante%20venezolano!5e0!3m2!1ses-419!2sve!4v1659414237411!5m2!1ses-419!2sve"
+            class="rounded flex h-full w-full aspect-square"
+            style="border:0;"
+            allowfullscreen
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          />
+        </div>
       </div>
     </Viewport>
   </div>

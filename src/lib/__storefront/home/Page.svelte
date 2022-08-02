@@ -532,13 +532,15 @@
 <div
   class="flex-col flex mx-auto w-full p-4 py-16 items-center overflow-hidden lg:w-9/10"
 >
-  <div class="flex w-full py-16 lg:px-8">
+  <div class="flex w-full py-16">
     <Viewport
       oneWay
       class="flex-col flex w-full items-center lg:flex-row-reverse lg:space-x-16 <lg:space-y-8"
       --a-y="1rem"
     >
-      <div class="flex flex-col space-y-6 w-full items-center justify-center">
+      <div
+        class="flex flex-col space-y-6 w-full items-center justify-center lg:px-8"
+      >
         <Corn32 class="h-52px text-dark-900 w-52px anim dark:text-gray-100 " />
         <ElementEditor
           root={nodes}

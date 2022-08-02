@@ -608,7 +608,7 @@
           <iframe
             title="Location"
             src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d10748.051701860451!2d-122.3127703!3d47.6647453!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x36f42ccb107444f6!2sArepa%20Restaurante%20venezolano!5e0!3m2!1ses-419!2sve!4v1659414237411!5m2!1ses-419!2sve"
-            class="rounded flex h-full w-full aspect-square"
+            class="border rounded flex h-full border-gray-300 w-full aspect-square dark:border-gray-600"
             style="border:0;"
             allowfullscreen
             loading="lazy"

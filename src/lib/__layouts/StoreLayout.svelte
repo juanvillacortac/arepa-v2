@@ -101,9 +101,9 @@
             bind:value={category}
           >
             <option value="">All categories</option>
-            <!-- {#each store.categories || [] as category}
+            {#each $page.stuff.categories || [] as category}
               <option value={category.slug}>{category.name}</option>
-            {/each} -->
+            {/each}
           </select>
           <button
             class="rounded-tr rounded-br flex bg-dark-800 text-white  p-2 items-center dark:bg-dark-400"
@@ -284,31 +284,51 @@
         <a href="tel:+12065564879" class="hover:underline">+1 206-556-4879</a>
       </div>
     </div>
-  </div>
-  <div class="bg-dark-900 w-full !text-white">
     <div
-      class="flex mx-auto text-xs w-full p-4 justify-between items-center <sm:flex-col <sm:space-y-4 <sm:items-center lg:w-9/10"
+      class="flex flex-col text-xs lg:flex-row lg:w-full lg:justify-between <lg:space-y-6"
     >
-      <p>
-        &copy; {new Date().getFullYear()}
-        Arepa Venezuelan Kitchen. All rights reserved.
-      </p>
-      <div class="flex space-x-4 items-center">
-        <a
-          href="https://www.facebook.com/ArepaVen/"
-          target="__blank"
-          class="duration-200 !hover:text-gray-400"
-        >
-          <LogoFacebook24 />
-        </a>
-        <a
-          href="https://www.instagram.com/arepa.vk"
-          target="__blank"
-          class="duration-200 !hover:text-gray-400"
-        >
-          <LogoInstagram24 />
-        </a>
+      <div class="flex flex-col space-y-2">
+        <div class="font-title font-bold text-xl text-dark-900 dark:text-white">
+          Pages
+        </div>
+        <a href="/" class="hover:underline">Home</a>
+        <a href="/favorites" class="hover:underline">Favorites</a>
+        <a href="/bag" class="hover:underline">Shopping bag</a>
+        <a href="/contact" class="hover:underline">Contact</a>
       </div>
+      <div class="flex flex-col space-y-2">
+        <div class="font-title font-bold text-xl text-dark-900 dark:text-white">
+          Menu
+        </div>
+        <a href="/menu" class="hover:underline">All</a>
+        {#each $page.stuff.categories || [] as c}
+          <a href="/menu?category={c.slug}" class="hover:underline">{c.name}</a>
+        {/each}
+      </div>
+    </div>
+  </div>
+  <div
+    class="flex mx-auto text-xs w-full p-4 justify-between items-center <sm:flex-col <sm:space-y-4 <sm:items-center lg:w-9/10"
+  >
+    <p>
+      &copy; {new Date().getFullYear()}
+      Arepa Venezuelan Kitchen. All rights reserved.
+    </p>
+    <div class="flex space-x-4 text-dark-900 items-center dark:text-white">
+      <a
+        href="https://www.facebook.com/ArepaVen/"
+        target="__blank"
+        class="duration-200 !hover:text-gray-400"
+      >
+        <LogoFacebook24 />
+      </a>
+      <a
+        href="https://www.instagram.com/arepa.vk"
+        target="__blank"
+        class="duration-200 !hover:text-gray-400"
+      >
+        <LogoInstagram24 />
+      </a>
     </div>
   </div>
 </div>

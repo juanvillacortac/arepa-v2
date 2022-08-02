@@ -1,11 +1,10 @@
 <script lang="ts">
   import { pageSubtitle } from '$lib'
-  import { Close24, Email24, Email32, PhoneFilled24 } from 'carbon-icons-svelte'
-  import { fade, fly, scale } from 'svelte/transition'
+  import { Close24, Email32 } from 'carbon-icons-svelte'
+  import { fade, fly } from 'svelte/transition'
   import { portal } from 'svelte-portal'
   import { expoOut } from 'svelte/easing'
   import trpc from '$lib/trpc/client'
-  import { page } from '$app/stores'
 
   $: $pageSubtitle = `Contact us`
 
@@ -80,9 +79,11 @@
   >
     <form
       on:submit|preventDefault={submit}
-      class="border rounded-lg flex flex-col space-y-4 border-gray-300 w-full p-4 lg:w-6/10 dark:border-dark-400"
+      class="border rounded-lg flex flex-col mx-auto space-y-4 border-gray-300 w-full p-4 lg:w-6/10 dark:border-dark-400"
     >
-      <h4 class="font-bold font-title text-xl">Contact form</h4>
+      <h4 class="font-bold font-title text-xl text-dark-900 dark:text-white">
+        Contact form
+      </h4>
       <div class="flex space-x-3">
         <div class="flex flex-col w-full">
           <label class="font-bold text-xs mb-2 block" for="fieldId"

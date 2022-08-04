@@ -253,7 +253,11 @@
 {/if}
 
 {#if readOnly}
-  <slot text={$textStore} href={$hrefStore} image={$imageStore} />
+  <slot
+    text={$textStore || ''}
+    href={$hrefStore || ''}
+    image={$imageStore || ''}
+  />
 {:else}
   <input
     type="file"

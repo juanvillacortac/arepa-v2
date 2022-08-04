@@ -64,9 +64,10 @@ export default trpc
         url: import.meta.env.VITE_UPSTASH_REDIS_URL,
         token: import.meta.env.VITE_UPSTASH_REDIS_TOKEN,
       })
-      const nodes = (await redis.get<{ json: any }>(`landingNodes-v2`))
+      const nodes = (await redis.get<{ json: any }>(`landingNodes-v3`))
         ?.json || {
         hero: 'Arepa Venezuelan Kitchen',
+        hero_txt: 'Arepa Venezuelan Kitchen',
         parallax: 'black',
         banner: {
           title: 'Our roots, like home',

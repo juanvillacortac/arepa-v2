@@ -16,7 +16,7 @@
 <script>
   export let nodes
 
-  const store = redisWritable(nodes, 'landingNodes-v2')
+  const store = redisWritable(nodes, 'landingNodes-v3')
 
   $pageSubtitle = 'Landing customization'
 </script>

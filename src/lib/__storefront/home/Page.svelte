@@ -191,12 +191,22 @@
         let:editable
       >
         <h1
-          class="font-bold font-handwritten p-2 text-4xl xl:text-6xl"
+          class="font-bold font-handwritten p-2 text-4xl xl:text-4xl"
           class:flag-gradient={!editable}
           use:contenteditable
         >
           {@html text}
         </h1>
+      </ElementEditor>
+      <ElementEditor
+        root={nodes}
+        keys={{ text: 'hero_txt' }}
+        let:text
+        let:contenteditable
+      >
+        <p class="mt-4 px-2" use:contenteditable>
+          {@html text}
+        </p>
       </ElementEditor>
     </div>
     <div

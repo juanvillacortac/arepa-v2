@@ -563,7 +563,7 @@
     </h3>
   </Viewport>
 
-  <div class="mx-auto grid gap-6 sm:grid-cols-2 lg:w-9/10 lg:grid-cols-4">
+  <div class="mx-auto grid p-4 gap-6 sm:grid-cols-2 lg:w-9/10 lg:grid-cols-4">
     {#each gallery as img}
       <div class="rounded flex w-full aspect-square overflow-hidden">
         <Image

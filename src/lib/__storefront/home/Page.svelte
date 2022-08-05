@@ -130,7 +130,7 @@
           class="m-auto rounded-2xl h-72 transform shadow-2xl w-52 -translate-y-5 relative overflow-hidden"
         >
           <div
-            class="bg-gradient-to-br flex h-full from-blue-300 to-blue-500 w-full opacity-80 absolute dark:(from-blue-500 to-blue-700) "
+            class="bg-gradient-to-br flex h-full from-green-300 to-blue-500 w-full opacity-80 absolute dark:(from-blue-500 to-blue-700) "
           />
           <Image
             src="https://images.unsplash.com/photo-1587603366933-aa6947174c65?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=389&q=80"
@@ -192,7 +192,7 @@
       >
         <h1
           class="font-bold font-handwritten p-2 text-4xl xl:text-4xl"
-          class:flag-gradient={!editable}
+          class:text-green-500={!editable}
           use:contenteditable
         >
           {@html text}
@@ -204,7 +204,7 @@
         let:text
         let:contenteditable
       >
-        <p class="mt-4 px-2" use:contenteditable>
+        <p class="px-2" use:contenteditable>
           {@html text}
         </p>
       </ElementEditor>
@@ -222,7 +222,7 @@
         </div>
 
         <div
-          class="flex bg-blue-300 bg-opacity-50 rounded-[50%] h-60 w-60 aspect-square items-center justify-center relative lg:h-80 lg:w-80"
+          class="flex bg-green-300 bg-opacity-50 rounded-[50%] h-60 w-60 aspect-square items-center justify-center relative lg:h-80 lg:w-80"
         >
           <Parallax
             threshold={{ top: 0, bottom: 0 }}
@@ -427,7 +427,7 @@
             let:image
           >
             <div
-              class="flex bg-blue-300 bg-opacity-50 rounded-[50%] h-60 w-60 aspect-square items-center justify-center relative overflow-hidden lg:h-80 lg:w-80"
+              class="flex bg-green-300 bg-opacity-50 rounded-[50%] h-60 w-60 aspect-square items-center justify-center relative overflow-hidden lg:h-80 lg:w-80"
             >
               <Image
                 src={image || ''}
@@ -613,7 +613,7 @@
           />
         </div>
         <div
-          class="rounded flex h-full bg-blue-300 bg-opacity-50 w-full aspect-square items-center justify-center relative overflow-hidden"
+          class="rounded flex h-full bg-green-300 bg-opacity-50 w-full aspect-square items-center justify-center relative overflow-hidden"
         >
           <iframe
             title="Location"

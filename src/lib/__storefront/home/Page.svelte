@@ -24,6 +24,7 @@
   import Image from '$lib/components/caravaggio/Image.svelte'
   import { favorites, watchMedia } from '$lib/stores'
   import Viewport from '$lib/components/Viewport.svelte'
+  import Instagram from 'svelte-instagram'
   import {
     Corn32,
     Favorite24,
@@ -628,6 +629,15 @@
       </div>
     </Viewport>
   </div>
+  <Instagram
+    horizontalScroll={true}
+    q={10}
+    showTitle={true}
+    size={200}
+    spacing={2}
+    title="Mis últimas imágenes de Instagram"
+    username="alextomas"
+  />
 </div>
 
 <style>

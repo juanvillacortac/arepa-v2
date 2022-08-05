@@ -3,6 +3,7 @@
   import {
     Category32,
     ColorPalette32,
+    Image32,
     OrderDetails32,
     Product32,
     Settings32,
@@ -29,6 +30,11 @@
       icon: UserAvatar32,
       title: 'Customers',
       href: `/customers`,
+    },
+    {
+      icon: Image32,
+      title: 'Gallery',
+      href: `/gallery`,
     },
     {
       icon: ColorPalette32,

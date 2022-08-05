@@ -169,10 +169,12 @@ export default trpc
           sanitize: true,
         })
 
-        let to = ['juanvillacortac@gmail.com']
+        let to =
+          (await redis.get<{ json: string }>(`contactEmail`))?.json ||
+          'juanvillacortac@gmail.com'
 
         const msg: MailDataRequired = {
-          to: [...new Set(to)],
+          to,
           from: {
             name: `${input.name} via Arepa Venezuelan Kitchen`,
             email: `contact@arepavenezuelakitchen.com`,

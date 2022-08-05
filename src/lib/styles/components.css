@@ -160,3 +160,11 @@ input[type='color']::-webkit-color-swatch-wrapper {
 	@apply from-orange-400;
 	@apply to-orange-600;
 }
+
+.medium-zoom-overlay {
+  background: rgba(0, 0, 0, 0.5) !important;
+  z-index: 555;
+}
+.medium-zoom-image {
+  z-index: 556;
+}

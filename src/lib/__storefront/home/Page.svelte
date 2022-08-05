@@ -1,15 +1,23 @@
 <script lang="ts" context="module">
   import type { Load } from '@sveltejs/kit'
 
-  export const load: Load = async ({ fetch, stuff }) => {
+  export const load: Load = async ({ fetch }) => {
+    const redis = new Redis({
+      url: import.meta.env.VITE_UPSTASH_REDIS_URL,
+      token: import.meta.env.VITE_UPSTASH_REDIS_TOKEN,
+    })
     const data = await trpc(fetch).query('products:list', {
       public: true,
     })
+    let gallery =
+      (await redis.get<{ json: Record<'path' | 'url', string>[] }>(`gallery`))
+        ?.json || []
     return {
       props: {
         data: {
           nodes: await trpc(fetch).query('utils:landingNodes'),
           products: data?.slice(0, 4) || [],
+          gallery,
         },
       },
     }
@@ -24,7 +32,6 @@
   import Image from '$lib/components/caravaggio/Image.svelte'
   import { favorites, watchMedia } from '$lib/stores'
   import Viewport from '$lib/components/Viewport.svelte'
-  import Instagram from 'svelte-instagram'
   import {
     Corn32,
     Favorite24,
@@ -39,6 +46,7 @@
   import { writable, type Writable } from 'svelte/store'
   import { dev } from '$app/env'
   import { scaleLinear } from 'd3-scale'
+  import { Redis } from '@upstash/redis'
 
   export let data: any | undefined = undefined
   export let editable = false
@@ -46,6 +54,7 @@
   setContext('readOnly', !editable)
 
   $: products = (data?.products as StripedProduct[]) || []
+  $: gallery = (data?.gallery as Record<'path' | 'url', string>[]) || []
 
   export let nodes: Writable<any> = writable(data?.nodes)
 
@@ -131,7 +140,7 @@
           class="m-auto rounded-2xl h-72 transform shadow-2xl w-52 -translate-y-5 relative overflow-hidden"
         >
           <div
-            class="bg-gradient-to-br flex h-full from-green-300 to-blue-500 w-full opacity-80 absolute dark:(from-blue-500 to-blue-700) "
+            class="bg-gradient-to-br flex h-full from-green-300 to-blue-500 w-full opacity-80 z-20 absolute dark:(from-blue-500 to-blue-700) "
           />
           <Image
             src="https://images.unsplash.com/photo-1587603366933-aa6947174c65?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=389&q=80"
@@ -540,6 +549,40 @@
   </div>
 {/if}
 
+{#if gallery.length}
+  <Viewport
+    oneWay
+    class="flex flex-col font-handwritten font-bold space-y-4 mb-8 w-full items-center"
+    --a-y="0.5rem"
+  >
+    <h3
+      class="font-bold text-3xl text-dark-900 anim lg:text-4xl dark:text-gray-100"
+      style:--anim-d="200ms"
+    >
+      Our <span class="font-handwritten px-1 orange-gradient">gallery</span>
+    </h3>
+  </Viewport>
+
+  <div class="mx-auto grid gap-6 sm:grid-cols-2 lg:w-9/10 lg:grid-cols-4">
+    {#each gallery as img}
+      <div class="rounded flex w-full aspect-square overflow-hidden">
+        <Image
+          lazy
+          zoom
+          src={img.url}
+          width="500"
+          height="500"
+          options={{
+            rs: {
+              s: '500x500',
+            },
+          }}
+        />
+      </div>
+    {/each}
+  </div>
+{/if}
+
 <div
   class="flex-col flex mx-auto w-full p-4 py-16 items-center overflow-hidden lg:w-9/10"
 >
@@ -629,15 +672,6 @@
       </div>
     </Viewport>
   </div>
-  <Instagram
-    horizontalScroll={true}
-    q={10}
-    showTitle={true}
-    size={200}
-    spacing={2}
-    title="Mis últimas imágenes de Instagram"
-    username="alextomas"
-  />
 </div>
 
 <style>

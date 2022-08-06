@@ -95,13 +95,17 @@
   --a-d="100ms"
   --a-y="0.5rem"
 >
-  <div
+  <!-- <div
     class="bg-cover bg-center flex h-full w-full opacity-50 absolute filter grayscale"
     style="background-image: url('https://media-cdn.tripadvisor.com/media/photo-s/09/1d/24/6c/arepa-venezuelan-kitchen.jpg')"
-  />
+  /> -->
   <div
-    class="bg-gradient-to-b from-transparent to-white flex h-[70%] w-full bottom-0 left-0 absolute dark:to-dark-800"
+    class="bg-cover bg-center flex h-full w-full absolute"
+    style="background-image: url('/images/hero.svg')"
   />
+  <!-- <div
+    class="bg-gradient-to-b from-transparent to-white flex h-[70%] w-full bottom-0 left-0 absolute dark:to-dark-800"
+  /> -->
   <div class="flex relative">
     <div
       class="flex h-full w-full transform  inset-0 absolute justify-center items-center sm:(translate-y-$my translate-x-$mx) <lg:scale-70 "

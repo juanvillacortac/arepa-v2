@@ -186,7 +186,7 @@
       </ElementEditor>
       <a
         href="/menu"
-        class="rounded-full font-bold border-2 border-dark-900 mt-8 text-xs py-2 px-4 text-dark-900 duration-200 hover:(bg-dark-900 text-gray-100) "
+        class="rounded-full font-bold border-2 border-dark-900 mt-8 text-xs py-2 px-4 text-dark-900 duration-200 dark:(border-gray-100 text-gray-100) hover:(bg-dark-900 text-gray-100) hover:dark:(bg-gray-100 text-dark-900) "
         >Order now</a
       >
     </div>

@@ -104,6 +104,11 @@
             <Search16 class="m-auto" />
           </button>
         </form>
+        <a
+          href="/menu"
+          class="rounded-full font-bold border-2 border-dark-900 text-xs py-1 px-3 text-dark-900 duration-200 sm:py-2 sm:px-4 dark:(border-gray-100 text-gray-100) hover:(bg-dark-900 text-gray-100) hover:dark:(bg-gray-100 text-dark-900) "
+          >Order now</a
+        >
         <button
           on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
           class="flex relative hover:text-black dark:hover:text-white"

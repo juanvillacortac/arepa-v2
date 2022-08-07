@@ -85,6 +85,8 @@
             }}
           />
         </a>
+      </div>
+      <div class="flex space-x-2 text-gray-400 items-center lg:space-x-4">
         <form
           class="flex py-2 <sm:hidden !text-xs"
           on:submit|preventDefault={submitSearch}
@@ -96,23 +98,12 @@
             bind:value={search}
             placeholder="Enter keywords to search..."
           />
-          <select
-            class="bg-white border-b border-l-0 border-r-0 border-gray-300  leading-tight py-2  px-3 w-16rem appearance-none <sm:hidden !border-t dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline"
-            bind:value={category}
-          >
-            <option value="">All categories</option>
-            {#each $page.stuff.categories || [] as category}
-              <option value={category.slug}>{category.name}</option>
-            {/each}
-          </select>
           <button
             class="rounded-tr rounded-br flex bg-dark-800 text-white  p-2 items-center dark:bg-dark-400"
           >
             <Search16 class="m-auto" />
           </button>
         </form>
-      </div>
-      <div class="flex space-x-2 text-gray-400 items-center lg:space-x-4">
         <button
           on:click={() => ($preferences.darkMode = !$preferences.darkMode)}
           class="flex relative hover:text-black dark:hover:text-white"
@@ -223,17 +214,17 @@
       </div>
     </div>
     <form
-      class="flex px-4 pb-4 sm:hidden !text-xs"
+      class="flex w-full px-4 pb-4 sm:hidden !text-xs"
       on:submit|preventDefault={submitSearch}
     >
       <input
-        class="bg-white border rounded-tl rounded-bl border-gray-300  text-xs leading-tight w-full py-2 px-3 appearance-none lg:w-20rem dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline focus:z-10"
+        class="bg-white border rounded-tl rounded-bl border-gray-300 text-xs  leading-tight w-full py-2 px-3 appearance-none lg:w-20rem dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline focus:z-10 "
         type="search"
         name="q"
         bind:value={search}
         placeholder="Enter keywords to search..."
       />
-      <select
+      <!-- <select
         class="bg-white border-b border-l-0 border-r-0 border-gray-300  leading-tight py-2  px-3 w-16rem appearance-none !border-t dark:bg-dark-700 dark:border-dark-400 focus:outline-none focus:shadow-outline"
         bind:value={category}
       >
@@ -241,7 +232,7 @@
         {#each $page.stuff.categories || [] as category}
           <option value={category.slug}>{category.name}</option>
         {/each}
-      </select>
+      </select> -->
       <button
         class="rounded-tr rounded-br flex bg-dark-800 text-white  p-2 items-center dark:bg-dark-400"
       >

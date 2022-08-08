@@ -15,6 +15,10 @@
     Settings16,
     OrderDetails16,
     LogoFacebook24,
+    Menu24,
+    OverflowMenuHorizontal24,
+    OverflowMenuVertical24,
+    Close24,
   } from 'carbon-icons-svelte'
   import { tooltip } from '$lib/components/tooltip'
   import { bag, customer, pageSubtitle, preferences } from '$lib/stores'
@@ -22,6 +26,8 @@
   import Submenu from '$lib/components/Submenu.svelte'
   import trpc from '$lib/trpc/client'
   import { browser, dev } from '$app/env'
+  import { fly } from 'svelte/transition'
+  import { expoOut } from 'svelte/easing'
 
   let subtitle = ''
   $: subtitle = $pageSubtitle ? $pageSubtitle : subtitle
@@ -46,6 +52,12 @@
     query.set('category', category)
     return `/menu?${query.toString()}`
   }
+
+  let open = false
+
+  $: if ($navigating) {
+    open = false
+  }
 </script>
 
 <svelte:head>
@@ -61,8 +73,29 @@
 <div
   class="flex flex-col min-h-screen top-0 left-0 text-gray-700 relative dark:text-white"
 >
+  {#if open}
+    <div
+      class="flex h-full bg-dark-900 w-full inset-0 text-gray-100 z-99 fixed"
+      transition:fly={{ duration: 400, x: 100, easing: expoOut }}
+    >
+      <div
+        class="flex flex-col font-bold font-title mx-auto space-y-6 text-lg w-full p-4 items-end lg:w-9/10"
+      >
+        <div class="flex h-28px items-center">
+          <button on:click={() => (open = false)} type="button">
+            <Close24 class="flex" />
+          </button>
+        </div>
+        <a href="/menu" class="hover:underline">Menu</a>
+        <a href="/#direction" class="hover:underline">Direction</a>
+        <a href="/contact" class="hover:underline">Make a Reservation</a>
+        <a href="/#direction" class="hover:underline">About Us</a>
+        <a href="/contact" class="hover:underline">Contact</a>
+      </div>
+    </div>
+  {/if}
   <div
-    class="bg-white border-b flex flex-col w-full top-0 z-80 items-center sticky filter blur-lg !bg-opacity-80 dark:bg-dark-800 dark:border-dark-400"
+    class="bg-white flex flex-col w-full top-0 z-80 items-center sticky filter blur-lg !bg-opacity-80 <lg:border-b dark:bg-dark-800 dark:border-dark-400"
   >
     <div class="flex mx-auto w-full p-4 justify-between items-center lg:w-9/10">
       <div class="flex space-x-4 items-center">
@@ -85,6 +118,12 @@
             }}
           />
         </a>
+        <div class="flex flex-col <lg:hidden">
+          <p class="font-bold text-xs">Direction</p>
+          <p class="text-xs">
+            1405 NE 50th St, Seattle, WA 98105, United States
+          </p>
+        </div>
       </div>
       <div class="flex space-x-2 text-gray-400 items-center lg:space-x-4">
         <form
@@ -216,6 +255,24 @@
             {$bag.length || 0}
           </p>
         </a>
+        <button
+          class="text-dark-900 lg:hidden dark:text-gray-100"
+          on:click={() => (open = true)}
+          type="button"
+        >
+          <OverflowMenuVertical24 />
+        </button>
+      </div>
+    </div>
+    <div class="bg-dark-900 w-full text-gray-100 <lg:hidden">
+      <div
+        class="flex font-bold mx-auto space-x-6 text-xs p-4 w-9/10 justify-center !py-2"
+      >
+        <a href="/menu" class="hover:underline">Menu</a>
+        <a href="/#direction" class="hover:underline">Direction</a>
+        <a href="/contact" class="hover:underline">Make a Reservation</a>
+        <a href="/#about" class="hover:underline">About Us</a>
+        <a href="/contact" class="hover:underline">Contact</a>
       </div>
     </div>
     <form

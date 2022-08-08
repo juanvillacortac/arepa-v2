@@ -91,7 +91,7 @@
 />
 
 <Viewport
-  class="bg-cover bg-center flex bg-opacity-5 w-full min-h-[calc(100vh-var(--nh))] p-4 justify-center items-center relative"
+  class="bg-cover bg-center flex bg-opacity-5 w-full min-h-[calc(60vh-var(--nh))] p-4 justify-center items-center relative lg:min-h-[calc(100vh-var(--nh))]"
   --a-d="100ms"
   --a-y="0.5rem"
 >
@@ -164,14 +164,13 @@
         let:editable
       >
         <h1
-          class="font-bold font-handwritten text-4xl xl:text-4xl"
-          class:flag-gradient={!editable}
+          class="font-bold font-handwritten text-4xl text-dark-900 xl:text-4xl dark:text-gray-100"
           use:contenteditable
         >
           {@html text}
         </h1>
       </ElementEditor>
-      <p class="font-handwritten font-bold text-xl mb-4 text-green-500">
+      <p class="font-handwritten font-bold text-xl mb-4 orange-gradient">
         Handcrafted Traditional Venezuelan Arepas
       </p>
       <ElementEditor
@@ -554,6 +553,7 @@
           let:contenteditable
         >
           <h4
+            id="about"
             class="font-handwritten text-dark-900 text-4xl anim dark:text-gray-100"
             style:--anim-d="100ms"
             class:flag-gradient={!editable}
@@ -610,6 +610,7 @@
           class="rounded flex h-full bg-green-300 bg-opacity-50 w-full aspect-square items-center justify-center relative overflow-hidden"
         >
           <iframe
+            id="direction"
             title="Location"
             src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d10748.051701860451!2d-122.3127703!3d47.6647453!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x36f42ccb107444f6!2sArepa%20Restaurante%20venezolano!5e0!3m2!1ses-419!2sve!4v1659414237411!5m2!1ses-419!2sve"
             class="border rounded flex h-full border-gray-300 w-full aspect-square dark:border-gray-600"
@@ -626,7 +627,7 @@
 
 <style>
   :global(*) {
-    --nh: 114px;
+    --nh: 116px;
   }
   @screen lg {
     :global(*) {

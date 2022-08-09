@@ -87,9 +87,9 @@
           </button>
         </div>
         <a href="/menu" class="hover:underline">Menu</a>
-        <a href="/#direction" class="hover:underline">Direction</a>
-        <a href="/contact" class="hover:underline">Make a Reservation</a>
-        <a href="/#direction" class="hover:underline">About Us</a>
+        <a href="/#location" class="hover:underline">Location</a>
+        <a href="/contact" class="hover:underline">Catering & Events</a>
+        <a href="/#about" class="hover:underline">About Us</a>
         <a href="/contact" class="hover:underline">Contact</a>
       </div>
     </div>
@@ -119,7 +119,7 @@
           />
         </a>
         <div class="flex flex-col <lg:hidden">
-          <p class="font-bold text-xs">Direction</p>
+          <p class="font-bold text-xs">Location</p>
           <p class="text-xs">
             1405 NE 50th St, Seattle, WA 98105, United States
           </p>
@@ -269,8 +269,8 @@
         class="flex font-bold mx-auto space-x-6 text-xs p-4 w-9/10 justify-center !py-2"
       >
         <a href="/menu" class="hover:underline">Menu</a>
-        <a href="/#direction" class="hover:underline">Direction</a>
-        <a href="/contact" class="hover:underline">Make a Reservation</a>
+        <a href="/#location" class="hover:underline">Location</a>
+        <a href="/contact" class="hover:underline">Catering & Events</a>
         <a href="/#about" class="hover:underline">About Us</a>
         <a href="/contact" class="hover:underline">Contact</a>
       </div>
@@ -326,7 +326,7 @@
     <div class="flex flex-col space-y-6 text-xs">
       <div class="flex flex-col space-y-2">
         <div class="font-title font-bold text-xl text-dark-900 dark:text-white">
-          Direction
+          Location
         </div>
         <p>1405 NE 50th St, Seattle, WA 98105, United States</p>
       </div>

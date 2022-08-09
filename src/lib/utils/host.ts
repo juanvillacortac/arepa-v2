@@ -1,5 +1,10 @@
+import {
+  PUBLIC_APP_HOST_SUBDOMAIN,
+  PUBLIC_CANONICAL_HOST,
+} from '$env/static/public'
+
 export function getDefaultHost(): string {
-  return import.meta.env.VITE_CANONICAL_HOST || __LOCALHOST_HOST__
+  return PUBLIC_CANONICAL_HOST || __LOCALHOST_HOST__
 }
 
 export function isCanonical(host?: string) {
@@ -13,9 +18,7 @@ export function isCanonical(host?: string) {
 export function getAbsoluteURL({
   path = '',
   host = getDefaultHost().replace(
-    import.meta.env.VITE_APP_HOST_SUBDOMAIN
-      ? `${import.meta.env.VITE_APP_HOST_SUBDOMAIN}.`
-      : '',
+    PUBLIC_APP_HOST_SUBDOMAIN ? `${PUBLIC_APP_HOST_SUBDOMAIN}.` : '',
     ''
   ),
   subdomain = '',

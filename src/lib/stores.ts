@@ -10,10 +10,14 @@ import { goto } from '$app/navigation'
 import * as sj from 'superjson'
 import trpc from './trpc/client'
 import { Redis } from '@upstash/redis'
+import {
+  PUBLIC_UPSTASH_REDIS_TOKEN,
+  PUBLIC_UPSTASH_REDIS_URL,
+} from '$env/static/public'
 
 const redis = new Redis({
-  url: import.meta.env.VITE_UPSTASH_REDIS_URL,
-  token: import.meta.env.VITE_UPSTASH_REDIS_TOKEN,
+  url: PUBLIC_UPSTASH_REDIS_URL,
+  token: PUBLIC_UPSTASH_REDIS_TOKEN,
 })
 
 type Media<Query extends Record<string, string> = Record<string, string>> = {

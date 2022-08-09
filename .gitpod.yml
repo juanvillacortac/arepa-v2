@@ -9,8 +9,8 @@ tasks:
     init: |
       pnpm install
     command: |
-      echo VITE_DATABASE_URL=mysql://root@127.0.0.1:3306/arepa > .env
-      export VITE_DATABASE_URL=mysql://root@127.0.0.1:3306/arepa
+      echo DATABASE_URL=mysql://root@127.0.0.1:3306/arepa > .env
+      export DATABASE_URL=mysql://root@127.0.0.1:3306/arepa
       pnpm run dev
   - name: Database
     command: |

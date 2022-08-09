@@ -1,10 +1,14 @@
 <script lang="ts" context="module">
   import type { Load } from '@sveltejs/kit'
+  import {
+    PUBLIC_UPSTASH_REDIS_TOKEN,
+    PUBLIC_UPSTASH_REDIS_URL,
+  } from '$env/static/public'
 
   export const load: Load = async ({ fetch }) => {
     const redis = new Redis({
-      url: import.meta.env.VITE_UPSTASH_REDIS_URL,
-      token: import.meta.env.VITE_UPSTASH_REDIS_TOKEN,
+      url: PUBLIC_UPSTASH_REDIS_URL,
+      token: PUBLIC_UPSTASH_REDIS_TOKEN,
     })
     const data = await trpc(fetch).query('products:list', {
       public: true,

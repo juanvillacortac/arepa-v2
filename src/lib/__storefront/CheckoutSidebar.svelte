@@ -56,9 +56,7 @@
   )
 
   onMount(async () => {
-    stripe = await loadStripe(
-      'pk_test_51I7RL6J2WplztltUdJyNQb1xLxVbXhB6QUu3R753Vuxq1xatD8cpU49K5m3q0fPfnK4ayhMPfg8xjLxxbrVqHjG600IC5Q2yzL'
-    )
+    stripe = await loadStripe(PUBLIC_STRIPE_PUBLIC_TOKEN)
     paypal = await loadScript({
       'client-id':
         'AeFkK76hZkhCrPuLpM1yAiCHXSzro1INVTH2S0WFmzuWekXPCIh4tdAGW569cRVRGIoLIUdOwrggqo-T',

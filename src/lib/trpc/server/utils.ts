@@ -7,6 +7,12 @@ import { marked } from 'marked'
 import { TRPCError } from '@trpc/server'
 import { Redis } from '@upstash/redis'
 import Stripe from 'stripe'
+import {
+  PUBLIC_GEOAPIFY_TOKEN,
+  PUBLIC_UPSTASH_REDIS_TOKEN,
+  PUBLIC_UPSTASH_REDIS_URL,
+} from '$env/static/public'
+import { SENDGRID_API_KEY, STRIPE_SECRET_TOKEN } from '$env/static/private'
 
 const coords = z.object({
   latitude: z.number(),
@@ -17,9 +23,7 @@ type Coords = z.infer<typeof coords>
 
 const lookup = async (coords: Coords) => {
   const res = await get(
-    `https://api.geoapify.com/v1/geocode/reverse?lat=${coords.latitude}&lon=${
-      coords.longitude
-    }&apiKey=${import.meta.env.VITE_GEOAPIFY_TOKEN}`
+    `https://api.geoapify.com/v1/geocode/reverse?lat=${coords.latitude}&lon=${coords.longitude}&apiKey=${PUBLIC_GEOAPIFY_TOKEN}`
   )
   return res as any
 }
@@ -31,14 +35,11 @@ const payment = trpc.router<tRPCContext>().mutation('createIntent', {
   }),
   output: z.string().nullable().describe('Stripe payment intent client secret'),
   resolve: async ({ input: { amount, currency } }) => {
-    const stripe = new Stripe(
-      'sk_test_51I7RL6J2WplztltUOlXaPetKyPuxBVvltv3Sw1saE28kDZRUBHiabRq4x4CifO8szv41kI8ed5zYp6de3Be36tZ200UiY7OksM',
-      {
-        // @ts-ignore
-        apiVersion: null,
-        typescript: true,
-      }
-    )
+    const stripe = new Stripe(STRIPE_SECRET_TOKEN, {
+      // @ts-ignore
+      apiVersion: null,
+      typescript: true,
+    })
 
     try {
       const paymentIntent = await stripe.paymentIntents.create({
@@ -61,8 +62,8 @@ export default trpc
   .query('landingNodes', {
     resolve: async () => {
       const redis = new Redis({
-        url: import.meta.env.VITE_UPSTASH_REDIS_URL,
-        token: import.meta.env.VITE_UPSTASH_REDIS_TOKEN,
+        url: PUBLIC_UPSTASH_REDIS_URL,
+        token: PUBLIC_UPSTASH_REDIS_TOKEN,
       })
       const nodes = (await redis.get<{ json: any }>(`landingNodes-v3`))
         ?.json || {
@@ -142,10 +143,10 @@ export default trpc
     }),
     resolve: async ({ input }) => {
       try {
-        sendgrid.setApiKey(import.meta.env.VITE_SENDGRID_API_KEY)
+        sendgrid.setApiKey(SENDGRID_API_KEY)
         const redis = new Redis({
-          url: import.meta.env.VITE_UPSTASH_REDIS_URL,
-          token: import.meta.env.VITE_UPSTASH_REDIS_TOKEN,
+          url: PUBLIC_UPSTASH_REDIS_URL,
+          token: PUBLIC_UPSTASH_REDIS_TOKEN,
         })
         let template =
           (await redis.get<{ json: string }>(`contactEmailTemplate`))?.json ||

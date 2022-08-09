@@ -40,7 +40,7 @@
   import { page } from '$app/stores'
   import { customer, pageSubtitle, redisWritable } from '$lib/stores'
   import { portal } from 'svelte-portal'
-  import { PUBLIC_STRIPE_PUBLIC_TOKEN } from '$env/static/public'
+  import { PUBLIC_PAYPAL_CLIENT_ID, PUBLIC_STRIPE_PUBLIC_TOKEN } from '$env/static/public'
 
   const countries = getCountries()
 
@@ -59,8 +59,7 @@
   onMount(async () => {
     stripe = await loadStripe(PUBLIC_STRIPE_PUBLIC_TOKEN)
     paypal = await loadScript({
-      'client-id':
-        'AeFkK76hZkhCrPuLpM1yAiCHXSzro1INVTH2S0WFmzuWekXPCIh4tdAGW569cRVRGIoLIUdOwrggqo-T',
+      'client-id': PUBLIC_PAYPAL_CLIENT_ID,
     })
   })
 

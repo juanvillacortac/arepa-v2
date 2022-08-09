@@ -40,6 +40,7 @@
   import { page } from '$app/stores'
   import { customer, pageSubtitle, redisWritable } from '$lib/stores'
   import { portal } from 'svelte-portal'
+  import { PUBLIC_STRIPE_PUBLIC_TOKEN } from '$env/static/public'
 
   const countries = getCountries()
 
